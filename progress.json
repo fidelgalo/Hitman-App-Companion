@@ -7,7 +7,10 @@
     "intel_0",
     "intel_1"
   ],
-  "challenges": [],
+  "challenges": [
+    "challenge_0",
+    "challenge_1"
+  ],
   "disguises": [],
-  "updated_at": "2026-06-01T23:50:49.124Z"
+  "updated_at": "2026-06-01T23:50:55.709Z"
 }
