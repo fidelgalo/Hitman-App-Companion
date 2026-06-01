@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>HITMAN 2 — Mission Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --red: #c8102e;
+  --red-glow: rgba(200,16,46,0.4);
+  --red-dim: rgba(200,16,46,0.15);
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --bg: #0e0e0e;
+  --bg2: #141414;
+  --bg3: #1a1a1a;
+  --bg4: #1f1f1f;
+  --border: #252525;
+  --border-light: #333;
+  --text: #f0f0f0;
+  --text-muted: #b8b8b8;
+  --text-dim: #6a6a6a;
+  --blue: #4a9edd;
+  --blue-dim: rgba(74,158,221,0.15);
+  --green: #4ecb7a;
+  --green-dim: rgba(78,203,122,0.12);
+  --purple: #a87fd4;
+  --purple-dim: rgba(168,127,212,0.12);
+  --orange: #e07b3a;
+  --orange-dim: rgba(224,123,58,0.12);
+  --teal: #4ecfb8;
+  --teal-dim: rgba(78,207,184,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
+
+/* ══ PAGES ══ */
+.page{display:none;animation:fadeIn .35s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ HOME ══ */
+#home{min-height:100vh;position:relative}
+.home-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,16,46,.1) 0%,transparent 65%),var(--bg)
+}
+.home-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 100px}
+
+.home-header{text-align:center;padding:52px 20px 28px;animation:slideDown .5s cubic-bezier(.16,1,.3,1) both}
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.header-line{width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--red));margin:0 auto 20px}
+.logo-hitman{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(40px,12vw,64px);letter-spacing:.22em;color:#fff;text-transform:uppercase;text-shadow:0 0 50px rgba(200,16,46,.25)}
+.logo-woa{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-size:clamp(9px,2.5vw,12px);letter-spacing:.55em;color:var(--red);text-transform:uppercase;margin-top:6px}
+.logo-divider{width:50px;height:1px;background:linear-gradient(to right,transparent,var(--red),transparent);margin:16px auto}
+.logo-tracker{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:11px;letter-spacing:.4em;color:var(--text-dim);text-transform:uppercase}
+
+/* Mission card */
+.mission-card-home{
+  position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid var(--border);
+  transition:border-color .3s,transform .2s;
+  animation:slideUp .5s .1s cubic-bezier(.16,1,.3,1) both
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mission-card-home:hover{border-color:var(--red);transform:translateY(-2px)}
+.mission-card-home:active{transform:scale(.99)}
+.mission-cover-home{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-home:hover .mission-cover-home{transform:scale(1.03)}
+.mission-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.08) 100%)}
+.red-scan{position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(to right,transparent,var(--red),transparent);animation:scan 3.5s 1s infinite}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.prog-ring-wrap{position:absolute;top:14px;right:14px;width:52px;height:52px}
+.prog-ring-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:3}
+.prog-ring-fill{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round;stroke-dasharray:138.2;stroke-dashoffset:138.2;transform:rotate(-90deg);transform-origin:27px 27px;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.prog-ring-pct{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+.mission-info-home{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-home{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.4em;color:var(--red);text-transform:uppercase;margin-bottom:3px}
+.mission-title-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-loc-home{font-size:13px;color:var(--text-muted);letter-spacing:.08em;margin-top:5px}
+
+/* Missions section label */
+.missions-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.45em;color:var(--text-dim);text-transform:uppercase;margin-top:28px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Missions grid — 2 columns for other missions */
+.missions-grid-other{display:block}
+.mission-card-sm{position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s,transform .2s;display:block;width:100%;margin-top:8px}
+.mission-card-sm:hover{border-color:rgba(200,16,46,.5);transform:translateY(-2px)}
+.mission-card-sm:active{transform:scale(.98)}
+.mission-cover-sm{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-sm:hover .mission-cover-sm{transform:scale(1.04)}
+.mission-overlay-sm{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.15) 60%,transparent 100%)}
+.mission-info-sm{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-sm{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.4em;color:var(--red);text-transform:uppercase;margin-bottom:3px}
+.mission-title-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(20px,5.5vw,30px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-soon-badge{position:absolute;top:14px;right:14px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;background:rgba(0,0,0,.7);border:1px solid var(--border-light);padding:4px 10px;backdrop-filter:blur(6px)}
+
+/* Stats */
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-top:none;background:var(--border);animation:slideUp .5s .2s cubic-bezier(.16,1,.3,1) both}
+.stat-box{background:var(--bg2);padding:12px 8px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:3px}
+
+
+/* ══ MISSION PAGE ══ */
+#mission{min-height:100vh;background:var(--bg)}
+
+/* Hero */
+.hero{position:relative;height:56vw;min-height:210px;max-height:360px;overflow:hidden}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 55%,var(--bg) 100%)}
+.hero-top{position:absolute;top:0;left:0;right:0;padding:max(env(safe-area-inset-top),12px) 16px 12px;display:flex;align-items:center}
+.back-btn{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);padding:8px 14px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 16px 18px}
+.hero-num{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.45em;color:var(--red);text-transform:uppercase}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,9vw,58px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:.95}
+.hero-loc{font-size:13px;color:var(--text-muted);letter-spacing:.1em;margin-top:6px}
+
+/* Brief */
+.brief-strip{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.brief-text{font-size:13.5px;line-height:1.7;color:var(--text-muted);text-align:justify;text-align-last:left}
+.targets-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.targets-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--text-dim);text-transform:uppercase}
+.target-chip{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;padding:3px 10px;text-transform:uppercase;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.4);color:#ff7a8a}
+.obj-chip{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;padding:3px 10px;text-transform:uppercase;background:var(--gold-dim);border:1px solid rgba(201,168,76,.35);color:var(--gold-light)}
+
+/* Overall prog */
+.overall-prog{padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.overall-prog-inner{display:flex;align-items:center;justify-content:space-between;padding:9px 0 3px}
+.overall-prog-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase}
+.overall-prog-val{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--red)}
+.prog-track{height:2px;background:rgba(255,255,255,.06);margin-bottom:10px}
+.prog-fill{height:100%;background:var(--red);transition:width .8s cubic-bezier(.16,1,.3,1);width:0%}
+
+/* Content */
+.mission-content{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* Section */
+.section-block{border-bottom:1px solid var(--border)}
+.section-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;background:var(--bg);transition:background .15s}
+.section-header:active{background:var(--bg3)}
+.sec-header-text{flex:1;min-width:0}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.1em;color:#fff;text-transform:uppercase;line-height:1}
+.sec-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:1px}
+.sec-prog{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+.sec-prog span{color:var(--red)}
+.sec-chevron{color:var(--text-dim);font-size:11px;flex-shrink:0;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.section-header.open .sec-chevron{transform:rotate(180deg)}
+.sec-prog-track{height:1px;background:rgba(255,255,255,.04)}
+.sec-prog-fill{height:100%;transition:width .6s cubic-bezier(.16,1,.3,1);width:0%}
+.sec-prog-fill-stories{background:var(--red)}
+.sec-prog-fill-intel{background:var(--blue)}
+.sec-prog-fill-challenges{background:var(--gold)}
+.sec-prog-fill-disguises{background:var(--green)}
+.section-body{display:none}
+.section-body.open{display:block;animation:bodyOpen .25s cubic-bezier(.16,1,.3,1)}
+@keyframes bodyOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STORIES ── */
+.story-item{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s;position:relative;overflow:hidden}
+.story-item.completed{opacity:.38}
+.story-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);transform:scaleY(0);transform-origin:top;transition:transform .2s}
+.story-item:hover::before{transform:scaleY(1)}
+.story-thumb-wrap{position:relative;width:110px;flex-shrink:0}
+.story-thumb{width:110px;height:100%;min-height:90px;object-fit:cover;display:block;background:var(--bg3)}
+.story-check-overlay{position:absolute;top:7px;left:7px;z-index:2}
+.story-body{padding:12px 14px;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.story-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.1}
+.story-subtitle-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--red);text-transform:uppercase;margin-top:3px}
+.story-desc{font-size:11.5px;line-height:1.55;color:#fff;margin-top:6px;text-align:justify;text-align-last:left}
+
+/* ── INTELLIGENCE ── */
+.intel-search-wrap{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.intel-search{flex:1;background:transparent;border:none;outline:none;font-family:'Barlow',sans-serif;font-size:14px;color:var(--text);padding:4px 0}
+.intel-search::placeholder{color:var(--text-dim)}
+.intel-search-icon{color:var(--text-dim);font-size:13px;flex-shrink:0}
+
+.intel-item{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s}
+.intel-item.completed{opacity:.38}
+.intel-check{display:flex;align-items:flex-start;justify-content:center;padding:16px 12px 16px 16px;flex-shrink:0;padding-top:17px}
+.intel-body{padding:13px 16px 13px 0;min-width:0;flex:1}
+.intel-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.15}
+.intel-desc{font-size:12px;line-height:1.6;color:#fff;margin-top:3px;text-align:justify;text-align-last:left}
+
+/* ── CHALLENGES ── */
+.challenge-filters{display:flex;gap:5px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg3)}
+.challenge-filters::-webkit-scrollbar{display:none}
+.cf-btn{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;padding:5px 12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;text-transform:uppercase;transition:all .15s;white-space:nowrap}
+.cf-btn.active,.cf-btn:hover{border-color:var(--red);color:#fff;background:var(--red-dim)}
+
+.challenge-card{border-bottom:1px solid var(--border);background:var(--bg);overflow:hidden}
+.challenge-card.completed .challenge-head{opacity:.35}
+.challenge-card.completed .challenge-body-content{opacity:.35}
+.challenge-head{display:grid;grid-template-columns:56px 1fr auto auto;align-items:center;cursor:pointer;transition:background .15s;min-height:58px}
+.challenge-head:active{background:var(--bg3)}
+.challenge-thumb-wrap{width:56px;height:56px;overflow:hidden;flex-shrink:0;background:var(--bg3)}
+.challenge-thumb{width:56px;height:56px;object-fit:cover;display:block}
+.challenge-head-body{padding:9px 8px 9px 13px;min-width:0}
+.challenge-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase;line-height:1.15;display:flex;align-items:flex-start;gap:6px}
+.challenge-type-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.challenge-xp{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--gold);margin-top:2px}
+.challenge-check-col{padding:8px 8px;display:flex;align-items:center;flex-shrink:0}
+.challenge-expand-col{padding:8px 13px 8px 0;display:flex;align-items:center;flex-shrink:0;color:var(--text-dim);font-size:11px;transition:transform .3s}
+.challenge-card.expanded .challenge-expand-col{transform:rotate(180deg)}
+.challenge-body-content{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.challenge-card.expanded .challenge-body-content{display:block;animation:bodyOpen .2s ease}
+.challenge-desc-text{font-size:13px;line-height:1.65;color:#fff;margin-top:12px;white-space:pre-line;text-align:justify;text-align-last:left}
+.challenge-reward-row{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.reward-img{width:72px;height:72px;object-fit:cover;border:1px solid var(--gold);background:var(--bg3);flex-shrink:0}
+.reward-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.reward-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase}
+
+.dot-A{background:var(--red)}
+.dot-D{background:var(--blue)}
+.dot-F{background:var(--gold)}
+.dot-T{background:var(--purple)}
+.dot-TC{background:var(--teal)}
+.dot-CN{background:var(--orange)}
+
+/* ── DISGUISES ── */
+.disguises-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:1px;background:var(--border)}
+.disguise-card{background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;gap:8px;transition:background .15s;position:relative}
+.disguise-card.completed .disguise-img{filter:grayscale(1) brightness(.45)}
+.disguise-card.completed .disguise-name{color:var(--text-dim)}
+.disguise-img-wrap{position:relative;width:86px;height:86px}
+.disguise-img{width:86px;height:86px;object-fit:cover;object-position:top center;display:block;border:1px solid var(--border);background:var(--bg3)}
+.disguise-done-overlay{display:none;position:absolute;inset:0;background:rgba(200,16,46,.35);align-items:center;justify-content:center;font-size:20px}
+.disguise-card.completed .disguise-done-overlay{display:flex}
+.disguise-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase;text-align:center;line-height:1.2}
+.disguise-check-pos{position:absolute;top:7px;right:7px}
+
+/* ── CHECKBOX ── */
+.custom-check{width:20px;height:20px;border:1.5px solid var(--border-light);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.custom-check:hover{border-color:var(--red);background:rgba(200,16,46,.1)}
+.custom-check.checked{border-color:var(--red);background:var(--red)}
+.custom-check.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+/* Checkbox sobre imagem — fundo cinza quando não selecionado */
+.story-check-overlay .custom-check,
+.disguise-check-pos .custom-check{background:rgba(30,30,30,.72);border-color:rgba(180,180,180,.5)}
+.story-check-overlay .custom-check:hover,
+.disguise-check-pos .custom-check:hover{background:rgba(200,16,46,.25);border-color:var(--red)}
+.story-check-overlay .custom-check.checked,
+.disguise-check-pos .custom-check.checked{background:var(--red);border-color:var(--red)}
+
+
+/* ── GITHUB SYNC ── */
+.sync-indicator{position:fixed;bottom:22px;left:18px;display:flex;align-items:center;gap:8px;z-index:200;cursor:pointer}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);transition:background .3s;flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:pulse .8s infinite}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.err{background:var(--red)}
+.sync-dot.off{background:var(--text-dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;transition:color .3s}
+.sync-indicator:hover .sync-lbl{color:var(--text-muted)}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--bg3);border:1px solid var(--border-light);max-width:440px;width:100%;padding:28px;position:relative}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.15em;color:var(--gold-light);text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.modal-sub a{color:var(--blue);text-decoration:none}
+.modal-sub a:hover{text-decoration:underline}
+.modal-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg2);border:1px solid var(--border-light);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.modal-input:focus{border-color:var(--red)}
+.modal-input::placeholder{color:var(--text-dim)}
+.modal-row{display:flex;gap:8px}
+.modal-btn{flex:1;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;transition:background .15s}
+.modal-btn-save{background:var(--red);color:#fff}
+.modal-btn-save:hover{background:#e01535}
+.modal-btn-cancel{background:var(--border-light);color:var(--text-muted)}
+.modal-btn-cancel:hover{background:var(--border)}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-status{font-size:12px;margin-top:12px;min-height:16px;color:var(--text-dim)}
+.modal-status.ok{color:var(--green)}
+.modal-status.err{color:#ff7a8a}
+.modal-divider{height:1px;background:var(--border);margin:18px 0}
+.modal-danger{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--red);text-transform:uppercase;cursor:pointer;background:none;border:none;padding:0}
+.modal-danger:hover{text-decoration:underline}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:22px;right:18px;width:44px;height:44px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;transform:translateY(10px);box-shadow:0 4px 18px rgba(200,16,46,.35)}
+.fab.visible{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:36px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase}
+
+/* ══ RESPONSIVE ══ */
+@media(min-width:480px){
+  .story-item{grid-template-columns:134px 1fr}
+  .story-thumb{width:134px}
+  .challenge-head{grid-template-columns:70px 1fr auto auto}
+  .challenge-thumb-wrap{width:70px;height:70px}
+  .challenge-thumb{width:70px;height:70px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:102px;height:102px}
+}
+@media(min-width:640px){
+  .story-item{grid-template-columns:158px 1fr}
+  .story-thumb{width:158px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:116px;height:116px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME ═══ -->
+<div id="home" class="page active">
+  <div class="home-bg"></div>
+  <div class="home-wrap">
+    <div class="home-header">
+      <div class="header-line"></div>
+      <div class="logo-hitman">HITMAN</div>
+      <div class="logo-woa">World of Assassination</div>
+      <div class="logo-divider"></div>
+      <div class="logo-tracker">Mission Tracker</div>
+    </div>
+
+    <div class="missions-label">Hitman 2 — Missões</div>
+
+    <!-- Missão 01 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="1 Nightcall/1_Nightcall_Cover.png" alt="Nightcall" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 01</div>
+        <div class="mission-title-sm">Nightcall</div>
+      </div>
+    </div>
+
+    <!-- Missão 02 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="2 The Finish Line/2_The_Finish_Line_Cover.png" alt="The Finish Line" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 02</div>
+        <div class="mission-title-sm">The Finish Line</div>
+      </div>
+    </div>
+
+    <!-- Missão 03 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="3 Three-Headed Serpent/3_Three-Headed_Serpent_Cover.png" alt="Three-Headed Serpent" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 03</div>
+        <div class="mission-title-sm">Three-Headed Serpent</div>
+      </div>
+    </div>
+
+    <!-- Missão 04 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="4 Chasing a Ghost/4_Chasing_a_Ghost_Cover.png" alt="Chasing a Ghost" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 04</div>
+        <div class="mission-title-sm">Chasing a Ghost</div>
+      </div>
+    </div>
+
+    <!-- Missão 05 — destaque interativo -->
+    <div class="mission-card-home" onclick="openMission()">
+      <div class="red-scan"></div>
+      <img class="mission-cover-home" src="5 Another Life/5_Another_Life_Cover.jpg" alt="Another Life" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-cover-overlay"></div>
+      <div class="prog-ring-wrap">
+        <svg viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg">
+          <circle class="prog-ring-bg" cx="27" cy="27" r="22"/>
+          <circle class="prog-ring-fill" id="home-ring" cx="27" cy="27" r="22"/>
+          <text class="prog-ring-pct" id="home-ring-pct" x="27" y="27">0%</text>
+        </svg>
+      </div>
+      <div class="mission-info-home">
+        <div class="mission-num-home">Missão 05 · Hitman 2</div>
+        <div class="mission-title-home">Another Life</div>
+        <div class="mission-loc-home">Whittleton Creek · Vermont, USA</div>
+      </div>
+    </div>
+
+    <!-- Missão 06 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="6 The Ark Society/6_The_Ark_Society_Cover.png" alt="The Ark Society" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 06</div>
+        <div class="mission-title-sm">The Ark Society</div>
+      </div>
+    </div>
+
+    <!-- Missão 07 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="7 Golden Handshake/7_Golden_Handshake_Cover.png" alt="Golden Handshake" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 07</div>
+        <div class="mission-title-sm">Golden Handshake</div>
+      </div>
+    </div>
+
+    <!-- Missão 08 -->
+    <div class="mission-card-sm">
+      <img class="mission-cover-sm" src="8 The Last Resort/8_The_Last_Resort_Cover.png" alt="The Last Resort" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-num-sm">Missão 08</div>
+        <div class="mission-title-sm">The Last Resort</div>
+      </div>
+    </div>
+
+    <div class="home-stats">
+      <div class="stat-box"><div class="stat-val" id="hs-stories">0/7</div><div class="stat-lbl">Stories</div></div>
+      <div class="stat-box"><div class="stat-val" id="hs-intel">0/45</div><div class="stat-lbl">Intel</div></div>
+      <div class="stat-box"><div class="stat-val" id="hs-challenges">0/82</div><div class="stat-lbl">Desafios</div></div>
+      <div class="stat-box"><div class="stat-val" id="hs-disguises">0/21</div><div class="stat-lbl">Disfarces</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ MISSION ═══ -->
+<div id="mission" class="page">
+  <div class="hero">
+    <img class="hero-img" src="5 Another Life/5_Another_Life_Cover.jpg" alt="Another Life" onerror="this.style.background='#1a1a1a'"/>
+    <div class="hero-overlay"></div>
+    <div class="hero-top">
+      <button class="back-btn" onclick="goHome()">← Voltar</button>
+    </div>
+    <div class="hero-content">
+      <div class="hero-num">Missão 05 · Hitman 2</div>
+      <div class="hero-title">Another Life</div>
+      <div class="hero-loc">Whittleton Creek · Vermont, USA</div>
+    </div>
+  </div>
+
+  <div class="brief-strip">
+    <p class="brief-text">Agent 47 entra na quieta subúrbia de Whittleton Creek para descobrir pistas sobre o Constant na casa de Janus — e eliminar Janus e o chefe de segurança Nolan Cassidy.</p>
+    <div class="targets-row">
+      <span class="targets-label">Alvos</span>
+      <span class="target-chip">Janus</span>
+      <span class="target-chip">Nolan Cassidy</span>
+      <span class="obj-chip">Encontrar Pistas</span>
+    </div>
+  </div>
+
+  <div class="overall-prog">
+    <div class="overall-prog-inner">
+      <span class="overall-prog-lbl">Progresso Geral</span>
+      <span class="overall-prog-val" id="overall-pct-lbl">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="overall-prog-fill"></div></div>
+  </div>
+
+  <div class="mission-content">
+
+    <!-- STORIES -->
+    <div class="section-block" id="sec-stories">
+      <div class="section-header open" onclick="toggleSec(this,'body-stories')">
+        <div class="sec-header-text">
+          <div class="sec-title">Mission Stories</div>
+          <div class="sec-meta">7 itens</div>
+        </div>
+        <div class="sec-prog" id="prog-stories"><span>0</span> / 7</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-stories" id="pf-stories"></div></div>
+      <div class="section-body open" id="body-stories">
+        <div id="stories-container"></div>
+      </div>
+    </div>
+
+    <!-- INTELLIGENCE -->
+    <div class="section-block" id="sec-intel">
+      <div class="section-header open" onclick="toggleSec(this,'body-intel')">
+        <div class="sec-header-text">
+          <div class="sec-title">Intelligence</div>
+          <div class="sec-meta">45 itens</div>
+        </div>
+        <div class="sec-prog" id="prog-intel"><span>0</span> / 45</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-intel" id="pf-intel"></div></div>
+      <div class="section-body open" id="body-intel">
+        <div class="intel-search-wrap">
+          <span class="intel-search-icon">🔎</span>
+          <input class="intel-search" type="text" placeholder="Buscar inteligência..." oninput="filterIntel(this.value)" autocomplete="off"/>
+        </div>
+        <div id="intel-container"></div>
+      </div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <div class="section-block" id="sec-challenges">
+      <div class="section-header open" onclick="toggleSec(this,'body-challenges')">
+        <div class="sec-header-text">
+          <div class="sec-title">Challenges</div>
+          <div class="sec-meta">82 itens</div>
+        </div>
+        <div class="sec-prog" id="prog-challenges"><span>0</span> / 82</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-challenges" id="pf-challenges"></div></div>
+      <div class="section-body open" id="body-challenges">
+        <div class="challenge-filters" id="challenge-filters">
+          <button class="cf-btn active" onclick="filterChallenges(this,'')">Todos</button>
+          <button class="cf-btn" onclick="filterChallenges(this,'A')">Assassinato</button>
+          <button class="cf-btn" onclick="filterChallenges(this,'D')">Descoberta</button>
+          <button class="cf-btn" onclick="filterChallenges(this,'F')">Feito</button>
+          <button class="cf-btn" onclick="filterChallenges(this,'T')">Target</button>
+          <button class="cf-btn" onclick="filterChallenges(this,'TC')">Clássico</button>
+          <button class="cf-btn" onclick="filterChallenges(this,'CN')">Contrato</button>
+        </div>
+        <div id="challenges-container"></div>
+      </div>
+    </div>
+
+    <!-- DISGUISES -->
+    <div class="section-block" id="sec-disguises">
+      <div class="section-header open" onclick="toggleSec(this,'body-disguises')">
+        <div class="sec-header-text">
+          <div class="sec-title">Disguises</div>
+          <div class="sec-meta">21 itens</div>
+        </div>
+        <div class="sec-prog" id="prog-disguises"><span>0</span> / 21</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-disguises" id="pf-disguises"></div></div>
+      <div class="section-body open" id="body-disguises">
+        <div class="disguises-grid" id="disguises-container"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const DATA = {
+  stories: [
+    { title:'Charbroiled', subtitle:'Dish best served cold.', desc:"The Wilsons are throwing a BBQ and everyone's invited. Nolan Cassidy has some interest in the party but is unwilling to go inside. Maybe you can help fix whatever's wrong, 47?", img:'5 Another Life/Stories/Stories_Charbroiled_Tile.jpg' },
+    { title:'Pest Control', subtitle:'Sleep tight.', desc:"There is a fumigator in town working on a house belonging to \"James Batty\", who previously worked on Cassidy's house. He stored a strong sedative in a container near the creek.", img:'5 Another Life/Stories/Stories_Pest_Control_Tile.jpg' },
+    { title:'House for Sale', subtitle:'Everything must go.', desc:"A realtor is in Whittleton Creek to show a house to Nolan Cassidy. He's stuck at a local muffin stand. It would be a shame to keep Cassidy waiting, wouldn't it?", img:'5 Another Life/Stories/Stories_House_For_Sale_Tile.jpg' },
+    { title:'Breadcrumb Trail', subtitle:'Follow the leads.', desc:"A lawsuit between Janus and another resident? A good place to start your investigation into Janus' life. Look closer at James Batty, 47.", img:'5 Another Life/Stories/Stories_Breadcrumb_Trail_Tile.jpg' },
+    { title:'An Apple a Day', subtitle:'Weekly visits for the health.', desc:"Janus has an appointment with a male nurse every Saturday. He's feeding birds by the creek. Sounds like a good way inside Janus' house.", img:'5 Another Life/Stories/Stories_An_Apple_A_Day_Tile.jpg' },
+    { title:'Whack-A-Mole', subtitle:'Secret underground network.', desc:"One of Janus' gardeners decided to clear mole tunnels using explosives — but the local police confiscated his equipment. If you find it, 47, it might be the perfect way to rid the world of Janus.", img:'5 Another Life/Stories/Stories_Whack-A-Mole_Tile.jpg' },
+    { title:'No Smoking Area', subtitle:'Smoking kills.', desc:"Janus smokes despite being on oxygen — his bodyguards keep hiding his cigarettes. What might happen if he combined smoking with the oxygen tank?", img:'5 Another Life/Stories/Stories_No_Smoking_Area_Tile.jpg' },
+  ],
+  intelligence: [
+    { title:'A Distant Memory', desc:'"Janus likes to tell stories from his past. Maybe you can trigger some of the more interesting ones?"' },
+    { title:'A Handwritten Letter', desc:'A Handwritten Letter' },
+    { title:'A Lawsuit?', desc:'"A lawsuit between Janus and one of the other residents in Whittleton Creek? Sounds promising."' },
+    { title:'A Quick Read', desc:'A Quick Read' },
+    { title:'A Robe', desc:'"Helen West has been repairing an old robe of Janus\'. A note indicates he has a great need for it — going to some sort of event where the robe is required."' },
+    { title:'An Old Diary', desc:'An Old Diary' },
+    { title:"Batty's Door Note", desc:'"I\'m in the garden. Ring the doorbell if you need me. — James Batty."' },
+    { title:"Batty's House Key", desc:"Batty's House Key" },
+    { title:'Buried Secrets', desc:'"One of Janus\' security guards buried something in the frog habitat behind Cassidy\'s house. Why?"' },
+    { title:"Cassidy's House Key", desc:"Cassidy's House Key" },
+    { title:'Construction Van Key', desc:'"A key. Unlocks the van exit in the Construction Area."' },
+    { title:'Find Clues', desc:'Find Clues' },
+    { title:'Follow the Leads', desc:'"A lawsuit between Janus and another resident? Might be a good place to start your investigation. Look closer at James Batty."' },
+    { title:"Frank Schmidt's Bedroom Key", desc:"Frank Schmidt's Bedroom Key" },
+    { title:"Frank Schmidt's House Key", desc:'"A key. Opens all the doors on the For Sale property."' },
+    { title:'Free Burgers', desc:'Free Burgers' },
+    { title:"Hanson's House Key", desc:'"A key. Opens all the doors on the Hanson\'s property."' },
+    { title:'Hidden Microfilm', desc:'Hidden Microfilm' },
+    { title:'Hidden Tapes', desc:'"A surveillance tape, which could hold interesting information."' },
+    { title:'In Honor of West', desc:'In Honor of West' },
+    { title:"Janus' Cigarettes", desc:'"One of Janus\' guards tossed his cigarettes over the fence. Janus is using an oxygen apparatus and the guard is trying to keep him alive."' },
+    { title:"Janus' House Key", desc:"Janus' House Key" },
+    { title:"Janus' Memory", desc:'"Music in Janus\' house triggered a memory of himself and the Constant. He handed over the role as Constant in an empty concert hall. The two still meet and are scheduled to see each other soon."' },
+    { title:"Janus' Microfilm", desc:"Janus' Microfilm" },
+    { title:"Janus' Old Photograph", desc:'"Evidence in his basement indicates Janus attends an annual gathering of "The Ark Society"."' },
+    { title:'Lawsuit Documents', desc:'Lawsuit Documents' },
+    { title:'Microfilm', desc:'"A microfilm with minutes from a recurring meeting gives a strong indication of when Janus might leave Whittleton Creek."' },
+    { title:'Note for Real Estate Company', desc:'Note for Real Estate Company' },
+    { title:'Pack of Cigarettes', desc:'"A pack of cigarettes."' },
+    { title:'Political Flyer', desc:'Political Flyer' },
+    { title:'Public Shed Key', desc:'"A key. Opens all public sheds in Whittleton Creek."' },
+    { title:'Return to Sender', desc:'Return to Sender' },
+    { title:'Roadwork Gate Key', desc:'"A key. Unlocks the gate exit in the Roadwork Area."' },
+    { title:'Robe', desc:'Robe' },
+    { title:'Surveillance Tape [Intel]', desc:'"A recording confirms Janus and the Constant are planning to meet soon."' },
+    { title:'Surveillance Tape [Item]', desc:'Surveillance Tape [Item]' },
+    { title:'The Fumigator', desc:'"A local fumigator is working on the Batty house after finishing Cassidy\'s house. Storing chemicals in a construction container nearby."' },
+    { title:'The Lost Photograph', desc:'The Lost Photograph' },
+    { title:'The Nurse', desc:'"Janus has a male nurse who comes every Saturday. The nurse has a fondness for local birds and can be found near the creek."' },
+    { title:'The Salesman', desc:'The Salesman' },
+    { title:'Uninvited Guests', desc:'"Janus has several moles digging tunnels in his back yard. A gardener is there to help but his explosives were confiscated by local police."' },
+    { title:'Vault Keycard', desc:'Vault Keycard' },
+    { title:"West's House Key", desc:'"A key. Opens all the doors on West\'s property."' },
+    { title:'Whittleton Creek Pikes', desc:'Whittleton Creek Pikes' },
+    { title:"Wilsons' House Key", desc:'"A key. Opens all the doors on the Wilsons\' property."' },
+  ],
+  challenges: [
+    { name:'Public Enemy', type:'A', desc:'Eliminate Janus and Nolan Cassidy with an SMG or an Assault Rifle.', xp:'+4000XP', item:'The Public Enemy Suit', itemImg:'5 Another Life/Challenges/Reward/ItemReward_The_Public_Enemy_Suit.jpg', img:'5 Another Life/Challenges/Public_Enemy_WoA.jpg' },
+    { name:'Unreasonable Scope', type:'A', desc:'Eliminate all targets with one shot with a sniper rifle from the tree house in the Schmidt garden.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Unreasonable_Scope_Challenge.jpg' },
+    { name:'Big Boom', type:'A', desc:'Eliminate both targets in a single explosion.', xp:'+4000XP', item:'The Party Cracker', itemImg:'5 Another Life/Challenges/Reward/ItemReward_The_Party_Cracker.jpg', img:'5 Another Life/Challenges/Big_Boom_Challenge.jpg' },
+    { name:'Monster Cookie', type:'A', desc:'Eliminate Janus with poisoned food.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Monster_Cookie.jpg' },
+    { name:'Sneezing Suspicion', type:'A', desc:'Eliminate Janus by letting him smoke near a leaking explosive tank.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Sneezing_Suspicion.jpg' },
+    { name:'Sold!', type:'A', desc:'Eliminate Nolan Cassidy using the security system in the "For Sale" basement.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Sold21.jpg' },
+    { name:'Doable Scope', type:'A', desc:'Eliminate a target with a sniper rifle from the tree house in the Schmidt garden.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Doable_Scope_Challenge.jpg' },
+    { name:'Explosive Potential', type:'A', desc:'Eliminate a target in an accident by dropping something heavy onto them or blowing them up.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Explosive_Potential.jpg' },
+    { name:'Finger on the Pulse', type:'A', desc:'Eliminate Janus by smothering him with a pillow during his health check.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Finger_on_the_Pulse.jpg' },
+    { name:'Tea Time', type:'A', desc:'Eliminate Janus with a poisoned drink.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Tea_Time_Whittleton_Creek.jpg' },
+    { name:'Death from Below', type:'A', desc:'Eliminate Janus in an explosion from a mole hole.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Death_from_Below.jpg' },
+    { name:'A Buffet to You, Sir', type:'A', desc:"Eliminate Nolan Cassidy in the Wilson's toilet after having poisoned him.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/A_Buffet_to_You2C_Sir.jpg' },
+    { name:'Reasonable Scope', type:'A', desc:'Kill all targets with a sniper rifle from the tree house in the Schmidt garden.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Reasonable_Scope_Challenge.jpg' },
+    { name:'Pass Gas', type:'A', desc:"Eliminate Nolan Cassidy using the exterminator's fumigation machine.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Pass_Gas.jpg' },
+    { name:'Memorabilia', type:'A', desc:'Eliminate Janus by impaling him on the hammer & sickle sculpture in his basement.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Memorabilia.jpg' },
+    { name:'Whittleton Creek Electric', type:'A', desc:'Kill any target with electricity.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Whittleton_Creek_Electric.jpg' },
+    { name:'Tasteless, Traceless', type:'A', desc:'Assassinate a target with lethal poison in Whittleton Creek.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Tasteless_H3.jpg' },
+    { name:'Straight Shot', type:'A', desc:'Assassinate a target with a headshot in Whittleton Creek.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Straight_Shot_H3.jpg' },
+    { name:'Sweet Recycling', type:'A', desc:'Eliminate a target with the garbage truck while disguised as a Server.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Sweet_Recycling_New.jpg' },
+    { name:'Versatile Assassin', type:'A', desc:'Complete: Piano Man, Someone Could Hurt Themselves, Hold My Hair, Straight Shot, Tasteless Traceless.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Versatile_H3.jpg' },
+    { name:'Someone Could Hurt Themselves', type:'A', desc:'Assassinate a target in an accident in Whittleton Creek.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Someone_Could_Hurt_Themselves.jpg' },
+    { name:'Piano Man', type:'A', desc:'Assassinate a target with the fiber wire in Whittleton Creek.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Piano_Man_H3.jpg' },
+    { name:'Hold My Hair', type:'A', desc:'Assassinate a target by drowning them in Whittleton Creek.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Hold_My_Hair.jpg' },
+    { name:'Whittleton Creek Blackout', type:'A', desc:'Eliminate both targets with electricity.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Whittleton_Creek_Blackout.jpg' },
+    { name:'Providence', type:'D', desc:'Find clues.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Providence.jpg' },
+    { name:'Become the Nurse', type:'D', desc:'Disguise yourself as the Nurse.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_the_Nurse.jpg' },
+    { name:"They See Me Paddlin'", type:'D', desc:'Use a raft to exit the mission.', xp:'+2000XP', item:null, itemImg:null, img:"Challenges/They_See_Me_Paddlin27.jpg" },
+    { name:'Become James Batty', type:'D', desc:'Disguise yourself as James Batty.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_James_Batty.jpg' },
+    { name:'Become the Mailman', type:'D', desc:'Disguise yourself as the Mailman.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_the_Mailman.jpg' },
+    { name:'Discover Whittleton Creek', type:'D', desc:'Reveal all undiscovered areas in Whittleton Creek.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Discover_Whittleton_Creek.jpg' },
+    { name:'Cowabunga!', type:'D', desc:'Use a manhole to exit the mission.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Cowabunga21.jpg' },
+    { name:'Become the BBQ King', type:'D', desc:'Disguise yourself as Richard Wilson, the BBQ King.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_the_BBQ_King.jpg' },
+    { name:'Remember to Recycle', type:'D', desc:'Use a trash truck to exit the mission.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Remember_to_Recycle.jpg' },
+    { name:'Become the Exterminator', type:'D', desc:'Disguise yourself as the Exterminator.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_the_Exterminator.jpg' },
+    { name:'Wear the Robe', type:'D', desc:"Obtain the Robe disguise from Helen's house.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Wear_the_Robe.jpg' },
+    { name:'Clocked Out', type:'D', desc:'Use the roadwork gate to exit the mission.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Clocked_Out.jpg' },
+    { name:'You Must be Trucking', type:'D', desc:'Use the construction van to exit the mission.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/You_Must_be_Trucking.jpg' },
+    { name:'Doing the Rounds', type:'D', desc:'Deliver 5 newspapers to mailboxes.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Doing_The_Rounds.jpg' },
+    { name:'Become the Politician', type:'D', desc:'Disguise yourself as the Politician.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_the_Politician.jpg' },
+    { name:'Chameleon', type:'D', desc:'Find and equip all disguises in Whittleton Creek.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Chameleon_H3.jpg' },
+    { name:'Become the Real Estate Broker', type:'D', desc:'Disguise yourself as the Real Estate Broker.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Become_the_Real_Estate_Broker.jpg' },
+    { name:'Mission Story - An Apple a Day', type:'F', desc:"Become Janus' personal nurse and infiltrate his home.", xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/An_Apple_A_Day_Tile.jpg' },
+    { name:'Ring Whittleton Creek', type:'F', desc:'Distract a resident with a doorbell.\nSneak into their home while they are distracted.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Ring_Whittleton_Creek.jpg' },
+    { name:'Priceless', type:'F', desc:"Deliver the package for Mr. Batty.\nThen find a way to make him go batty.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Priceless.jpg' },
+    { name:'Mission Story - House for Sale', type:'F', desc:'Go house hunting with Nolan Cassidy in Whittleton Creek.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/House_For_Sale_Tile.jpg' },
+    { name:'Wet Bandit', type:'F', desc:'Dump a target down a manhole.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Wet_Bandit.jpg' },
+    { name:'Mission Story - Whack-a-Mole', type:'F', desc:'Secret underground network.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Whack-A-Mole_Tile.jpg' },
+    { name:'Friendly Neighborhood Hitman', type:'F', desc:"Complete: Stuffed, Early Birdy and Snail Mail.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Friendly_Neighborhood_Hitman.jpg' },
+    { name:'Snail Mail', type:'F', desc:'Help the mailman by delivering the package to Mr. Batty.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Snail_Mail.jpg' },
+    { name:'Mission Story - Charbroiled', type:'F', desc:'Dish best served cold.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Charbroiled_Tile.jpg' },
+    { name:'Master Detective', type:'F', desc:'Find all clues in Whittleton Creek.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Master_Detective.jpg' },
+    { name:'Tunnel Ducks Rule!', type:'F', desc:'Discover the underground tunnel.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/TunnelDucksRule.jpg' },
+    { name:'They Must Pie', type:'F', desc:"Dump any character into the oven in Helen West's basement.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/They_Must_Pie.jpg' },
+    { name:'Battle Frogs', type:'F', desc:'Capture a pickerel frog.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Battle_Frogs.jpg' },
+    { name:'Pickpocket', type:'F', desc:"Intercept Janus' letter before it is delivered in Cassidy's home.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Pickpocket.jpg' },
+    { name:'Early Birdy', type:'F', desc:"Make the nurse go to Janus' health check by scaring the ducks.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Early_Birdy.jpg' },
+    { name:'Extensive Presentation', type:'F', desc:'Present every room in the house for sale to Nolan Cassidy.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Extensive_Presentation.jpg' },
+    { name:'Stuffed', type:'F', desc:'Somehow make the Real Estate Agent go to the house showing with Nolan Cassidy... Om nom nom.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Stuffed.jpg' },
+    { name:'Just a Bite', type:'F', desc:"Make one of Nolan Cassidy's Bodyguards eat a muffin at the house for sale.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Just_a_Bite.jpg' },
+    { name:'Walkthrough', type:'F', desc:"Serve at least 3 people at the Wilson's party disguised as a Server.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Walkthrough.jpg' },
+    { name:'Propaganda', type:'F', desc:'Deliver a political flyer to any mailbox in Whittleton Creek.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Propaganda.jpg' },
+    { name:'Mission Story - Breadcrumb Trail', type:'F', desc:'Investigate Whittleton Creek and track down the Constant.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Breadcrumb_Trail_Tile.jpg' },
+    { name:'Mission Story - Pest Control', type:'F', desc:'Sleep tight.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Pest_Control_Tile.jpg' },
+    { name:'Upscaled', type:'F', desc:'Make a character of Whittleton Creek trigger the singing fish.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Upscaled.jpg' },
+    { name:'Elderly Assistance', type:'F', desc:"Figure out a way to make Janus' day.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/ElderlyAssistance.jpg' },
+    { name:'Mission Story - No Smoking Area', type:'F', desc:'Smoking kills.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/No_Smoking_Area_Tile.jpg' },
+    { name:'Old Grudges', type:'F', desc:'Unearth the hatchet.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/OldGrudges.jpg' },
+    { name:'Sleepy Cake', type:'F', desc:'Pacify all the Servers.\nDo not pacify or eliminate Helen West.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Sleepy_Cake_New.jpg' },
+    { name:'Public Enemy No. 1', type:'F', desc:"Pacify 3 police deputies.\nDon't let their bodies be found.", xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Public_Enemy_No._1.jpg' },
+    { name:'Raking it In', type:'F', desc:'Make any target step on a rake and become pacified.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Raking_it_In.jpg' },
+    { name:'Troll Toll', type:'F', desc:'Dump a body down the well in the public park.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Troll_Toll.jpg' },
+    { name:'Quack? Quack!', type:'F', desc:'Quack, quack, quack, quack...', xp:'+2000XP', item:'The Egg Hunt Suit', itemImg:'5 Another Life/Challenges/Reward/ItemReward_Egg_Hunt_Suit.jpg', img:'5 Another Life/Challenges/Quack__Quack!.jpg' },
+    { name:'You Had Me at Bodyguard', type:'F', desc:'Destroy all cameras.', xp:'+2000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/You_Had_Me_at_Bodyguard.jpg' },
+    { name:'Breaking News', type:'F', desc:'Pacify any target with a newspaper.', xp:'+1000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Breaking_News.jpg' },
+    { name:'The Past', type:'T', desc:'Assassinate Janus.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/The_Past.jpg' },
+    { name:'The Present', type:'T', desc:'Assassinate Nolan Cassidy.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/The_Present.jpg' },
+    { name:'Silent Assassin, Suit Only', type:'TC', desc:'Complete "Another Life".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nErase camera evidence.\nDo it all in your suit.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/SilentAssassin_SuitOnly.jpg' },
+    { name:'Silent Assassin', type:'TC', desc:'Complete "Another Life".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf detected by cameras, erase or destroy the evidence.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/SilentAssassin.jpg' },
+    { name:'Suit Only', type:'TC', desc:'Assassinate the targets and complete the mission.\nDo it all in your suit.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/SuitOnly.jpg' },
+    { name:'Sniper Assassin', type:'TC', desc:'Complete "Another Life".\nAssassinate your targets with a sniper rifle.\nOnly eliminate the targets.\nDo not get spotted.\nErase camera evidence.', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/Sniper_Assassin.jpg' },
+    { name:'The Classics', type:'TC', desc:'Complete all Classic challenges on "Another Life":\nSilent Assassin\nSilent Assassin, Suit Only\nSniper Assassin\nSuit Only', xp:'+4000XP', item:null, itemImg:null, img:'5 Another Life/Challenges/The_Classics.jpg' },
+    { name:'Welcome to Business Class', type:'CN', desc:'Dressed as a Server, pacify any target in Whittleton Creek by throwing a suitcase at them.', xp:'+2000XP', item:'Orange Pinstripe Briefcase', itemImg:'5 Another Life/Challenges/Reward/ItemReward_Orange_Pinstripe_Briefcase.jpg', img:'5 Another Life/Challenges/Welcome_to_Business_Class_WoA.jpg' },
+  ],
+  disguises: [
+    { name:'Suburban Suit', img:'5 Another Life/Disguises/Suburban_Suit_Tile.jpg' },
+    { name:'Arkian Robe', img:'5 Another Life/Disguises/Arkian_Robe_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'BBQ Owner', img:'5 Another Life/Disguises/BBQ_Owner_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Cassidy Bodyguard', img:'5 Another Life/Disguises/Cassidy_Bodyguard_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Construction Worker', img:'5 Another Life/Disguises/Construction_Worker_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Exterminator', img:'5 Another Life/Disguises/Exterminator_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Garbage Man', img:'5 Another Life/Disguises/Garbage_Man_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Gardener', img:'5 Another Life/Disguises/Gardener_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Gunther Mueller', img:'5 Another Life/Disguises/Gunther_Mueller_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'James Batty', img:'5 Another Life/Disguises/James_Batty_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:"Janus' Bodyguard", img:'5 Another Life/Disguises/Janus27_Bodyguard_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Mailman', img:'5 Another Life/Disguises/Mailman_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Nurse', img:'5 Another Life/Disguises/Nurse_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Plumber', img:'5 Another Life/Disguises/Plumber_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Police Deputy', img:'5 Another Life/Disguises/Police_Deputy_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Politician', img:'5 Another Life/Disguises/Politician_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:"Politician's Assistant", img:'5 Another Life/Disguises/Politician27s_Assistant_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Real Estate Broker', img:'5 Another Life/Disguises/Real_Estate_Broker_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Server', img:'5 Another Life/Disguises/Server_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Sheriff Masterson', img:'5 Another Life/Disguises/Sheriff_Masterson_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name:'Spencer "The Hammer" Green', img:'5 Another Life/Disguises/Spencer_22_Green_Outfit_-_Whittleton_Creek.JPG.jpg' },
+  ]
+};
+
+// ── STATE ──
+const state = { stories:new Set(), intelligence:new Set(), challenges:new Set(), disguises:new Set() };
+
+function saveStateLocal() {
+  localStorage.setItem('hitman_al_v2', JSON.stringify({
+    stories:[...state.stories], intelligence:[...state.intelligence],
+    challenges:[...state.challenges], disguises:[...state.disguises]
+  }));
+}
+function saveState() { saveStateLocal(); scheduleSave(); }
+function loadState() {
+  try {
+    const raw = localStorage.getItem('hitman_al_v2') || localStorage.getItem('hitman_another_life');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    state.stories=new Set(s.stories||[]); state.intelligence=new Set(s.intelligence||[]);
+    state.challenges=new Set(s.challenges||[]); state.disguises=new Set(s.disguises||[]);
+  } catch(e){}
+}
+
+// ── CHECKBOX ──
+function mkCheck(cat, id) {
+  const el = document.createElement('div');
+  el.className = 'custom-check' + (state[cat].has(id) ? ' checked' : '');
+  el.dataset.category = cat; el.dataset.id = id;
+  el.onclick = function(e) { e.stopPropagation(); toggleItem(cat, id, this); };
+  return el;
+}
+function toggleItem(cat, id, boxEl) {
+  if (state[cat].has(id)) { state[cat].delete(id); boxEl.classList.remove('checked'); }
+  else { state[cat].add(id); boxEl.classList.add('checked'); }
+  saveState();
+  const row = boxEl.closest('.story-item,.intel-item,.challenge-card,.disguise-card');
+  if (row) row.classList.toggle('completed', state[cat].has(id));
+  updateProgress(); updateHomeProgress();
+}
+
+// ── RENDER STORIES ──
+function renderStories() {
+  const c = document.getElementById('stories-container'); c.innerHTML='';
+  DATA.stories.forEach((s,i) => {
+    const id='story_'+i;
+    const el=document.createElement('div');
+    el.className='story-item'+(state.stories.has(id)?' completed':'');
+
+    // Thumb wrapper with checkbox overlay
+    const thumbWrap=document.createElement('div'); thumbWrap.className='story-thumb-wrap';
+    const img=document.createElement('img');
+    img.className='story-thumb'; img.src=s.img; img.alt=s.title;
+    img.onerror=function(){this.style.background='#1a1a1a'};
+    const checkOverlay=document.createElement('div'); checkOverlay.className='story-check-overlay';
+    checkOverlay.appendChild(mkCheck('stories',id));
+    thumbWrap.appendChild(img); thumbWrap.appendChild(checkOverlay);
+
+    // Body: title first, subtitle below, then desc
+    const body=document.createElement('div'); body.className='story-body';
+    body.innerHTML=`<div class="story-title">${s.title}</div>
+      <div class="story-subtitle-tag">${s.subtitle}</div>
+      <div class="story-desc">${s.desc}</div>`;
+
+    el.appendChild(thumbWrap); el.appendChild(body);
+    c.appendChild(el);
+  });
+}
+
+// ── RENDER INTEL ──
+function renderIntelligence(filter='') {
+  const c=document.getElementById('intel-container'); c.innerHTML='';
+  const lf=filter.toLowerCase(); let cnt=0;
+  DATA.intelligence.forEach((item,i) => {
+    if (lf && !item.title.toLowerCase().includes(lf) && !item.desc.toLowerCase().includes(lf)) return;
+    cnt++;
+    const id='intel_'+i;
+    const el=document.createElement('div');
+    el.className='intel-item'+(state.intelligence.has(id)?' completed':'');
+    const checkWrap=document.createElement('div'); checkWrap.className='intel-check';
+    checkWrap.appendChild(mkCheck('intelligence',id));
+    const body=document.createElement('div'); body.className='intel-body';
+    const showDesc = item.desc !== item.title && !item.desc.match(/^[A-Z].*[^"?.]$/) && item.desc.length > item.title.length + 3;
+    body.innerHTML=`<div class="intel-title">${item.title}</div>`+
+      (showDesc ? `<div class="intel-desc">${item.desc}</div>` : '');
+    el.appendChild(checkWrap); el.appendChild(body); c.appendChild(el);
+  });
+  if (!cnt) c.innerHTML='<div class="empty-state">Nenhum resultado encontrado</div>';
+}
+function filterIntel(v){renderIntelligence(v);}
+
+// ── RENDER CHALLENGES ──
+function renderChallenges(typeFilter) {
+  const c=document.getElementById('challenges-container'); c.innerHTML='';
+  DATA.challenges.forEach((ch,i) => {
+    if (typeFilter && ch.type!==typeFilter) return;
+    const id='challenge_'+i;
+    const card=document.createElement('div');
+    card.className='challenge-card'+(state.challenges.has(id)?' completed':'');
+
+    const head=document.createElement('div'); head.className='challenge-head';
+    head.onclick=function(){card.classList.toggle('expanded');};
+
+    const tw=document.createElement('div'); tw.className='challenge-thumb-wrap';
+    const thumb=document.createElement('img'); thumb.className='challenge-thumb';
+    thumb.src=ch.img; thumb.alt=ch.name;
+    thumb.onerror=function(){this.style.background='#1a1a1a'};
+    tw.appendChild(thumb);
+
+    const hb=document.createElement('div'); hb.className='challenge-head-body';
+    hb.innerHTML=`<div class="challenge-name"><span class="challenge-type-dot dot-${ch.type}"></span>${ch.name}</div>
+      <div class="challenge-xp">${ch.xp}${ch.item?' · 🎁':''}</div>`;
+
+    const cc=document.createElement('div'); cc.className='challenge-check-col';
+    cc.appendChild(mkCheck('challenges',id));
+
+    const ec=document.createElement('div'); ec.className='challenge-expand-col';
+    ec.textContent='▼';
+
+    head.appendChild(tw); head.appendChild(hb); head.appendChild(cc); head.appendChild(ec);
+
+    const body=document.createElement('div'); body.className='challenge-body-content';
+    let bHTML=`<div class="challenge-desc-text">${ch.desc.replace(/\n/g,'<br>')}</div>`;
+    if (ch.item && ch.itemImg) {
+      bHTML+=`<div class="challenge-reward-row">
+        <img class="reward-img" src="${ch.itemImg}" alt="${ch.item}" onerror="this.style.display='none'"/>
+        <div class="reward-info"><div class="reward-label">Recompensa</div><div class="reward-name">${ch.item}</div></div>
+      </div>`;
+    }
+    body.innerHTML=bHTML;
+    card.appendChild(head); card.appendChild(body); c.appendChild(card);
+  });
+}
+function filterChallenges(btn, type) {
+  document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChallenges(type);
+  // reapply completed
+  DATA.challenges.forEach((_,i)=>{
+    const id='challenge_'+i;
+    if (state.challenges.has(id)) {
+      const box=document.querySelector(`[data-category="challenges"][data-id="${id}"]`);
+      if(box){box.classList.add('checked');const card=box.closest('.challenge-card');if(card)card.classList.add('completed');}
+    }
+  });
+}
+
+// ── RENDER DISGUISES ──
+function renderDisguises() {
+  const c=document.getElementById('disguises-container'); c.innerHTML='';
+  DATA.disguises.forEach((d,i)=>{
+    const id='disguise_'+i;
+    const card=document.createElement('div');
+    card.className='disguise-card'+(state.disguises.has(id)?' completed':'');
+    const iw=document.createElement('div'); iw.className='disguise-img-wrap';
+    const img=document.createElement('img'); img.className='disguise-img';
+    img.src=d.img; img.alt=d.name;
+    img.onerror=function(){this.style.background='#1a1a1a'};
+    const ov=document.createElement('div'); ov.className='disguise-done-overlay'; ov.textContent='✓';
+    iw.appendChild(img); iw.appendChild(ov);
+    const nm=document.createElement('div'); nm.className='disguise-name'; nm.textContent=d.name;
+    const cp=document.createElement('div'); cp.className='disguise-check-pos'; cp.appendChild(mkCheck('disguises',id));
+    card.appendChild(iw); card.appendChild(nm); card.appendChild(cp);
+    c.appendChild(card);
+  });
+}
+
+// ── PROGRESS ──
+function updateProgress() {
+  const secs=[
+    {key:'stories',     total:DATA.stories.length,     prog:'prog-stories',    fill:'pf-stories'},
+    {key:'intelligence',total:DATA.intelligence.length, prog:'prog-intel',      fill:'pf-intel'},
+    {key:'challenges',  total:DATA.challenges.length,   prog:'prog-challenges', fill:'pf-challenges'},
+    {key:'disguises',   total:DATA.disguises.length,    prog:'prog-disguises',  fill:'pf-disguises'},
+  ];
+  secs.forEach(s=>{
+    const done=state[s.key].size;
+    const el=document.getElementById(s.prog);
+    if(el) el.innerHTML=`<span>${done}</span> / ${s.total}`;
+    const f=document.getElementById(s.fill);
+    if(f) f.style.width=(s.total>0?done/s.total*100:0)+'%';
+  });
+  const total=DATA.stories.length+DATA.intelligence.length+DATA.challenges.length+DATA.disguises.length;
+  const done=state.stories.size+state.intelligence.size+state.challenges.size+state.disguises.size;
+  const pct=total>0?Math.round(done/total*100):0;
+  const pf=document.getElementById('overall-prog-fill'); if(pf) pf.style.width=pct+'%';
+  const pl=document.getElementById('overall-pct-lbl'); if(pl) pl.textContent=pct+'%';
+}
+function updateHomeProgress() {
+  const total=DATA.stories.length+DATA.intelligence.length+DATA.challenges.length+DATA.disguises.length;
+  const done=state.stories.size+state.intelligence.size+state.challenges.size+state.disguises.size;
+  const pct=total>0?Math.round(done/total*100):0;
+  const C=138.23;
+  const ring=document.getElementById('home-ring'); if(ring) ring.style.strokeDashoffset=C-(C*pct/100);
+  const rp=document.getElementById('home-ring-pct'); if(rp) rp.textContent=pct+'%';
+  const st=(k,t)=>`${state[k].size}/${t}`;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('hs-stories',st('stories',DATA.stories.length));
+  set('hs-intel',st('intelligence',DATA.intelligence.length));
+  set('hs-challenges',st('challenges',DATA.challenges.length));
+  set('hs-disguises',st('disguises',DATA.disguises.length));
+}
+
+// ── SECTION TOGGLE ──
+function toggleSec(headerEl, bodyId) {
+  const body=document.getElementById(bodyId);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  headerEl.classList.toggle('open',!open);
+}
+
+// ── NAVIGATION ──
+function openMission(){
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('mission').classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome(){
+  document.getElementById('mission').classList.remove('active');
+  document.getElementById('home').classList.add('active');
+  window.scrollTo(0,0);
+  updateHomeProgress();
+}
+
+// ── SCROLL FAB ──
+window.addEventListener('scroll',()=>{
+  const f=document.getElementById('fab');
+  f.classList.toggle('visible', window.scrollY>250);
+},{passive:true});
+
+
+// ══════════════════════════════════════════════════════════════════
+// GITHUB SYNC
+// ══════════════════════════════════════════════════════════════════
+const GH = {
+  owner: 'fidelgalo',
+  repo:  'Hitman-App-Companion',
+  file:  'progress.json',
+  branch:'main',
+  get token() { return localStorage.getItem('gh_pat') || ''; },
+  get api()   { return `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.file}`; }
+};
+
+let syncTimer = null;
+let lastSha = null;  // SHA do arquivo no GitHub (necessário para update)
+
+// ── Indicador visual ──────────────────────────────────────────────
+function setSyncState(s, lbl) {
+  const dot = document.getElementById('sync-dot');
+  const lb  = document.getElementById('sync-lbl');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + s;
+  if (lb && lbl) lb.textContent = lbl;
+}
+
+// ── Modal ─────────────────────────────────────────────────────────
+function openModal() {
+  const modal = document.getElementById('sync-modal');
+  modal.classList.add('open');
+  // fechar ao clicar fora (registrado uma única vez via flag)
+  if (!modal._listenerAdded) {
+    modal.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    modal._listenerAdded = true;
+  }
+  const inp = document.getElementById('token-input');
+  if (GH.token) inp.value = GH.token;
+  document.getElementById('modal-status').textContent = '';
+  document.getElementById('modal-status').className = 'modal-status';
+}
+function closeModal() {
+  document.getElementById('sync-modal').classList.remove('open');
+}
+
+
+async function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val) { setModalStatus('Cole um token válido.', 'err'); return; }
+  localStorage.setItem('gh_pat', val);
+  setModalStatus('Verificando...', '');
+  const ok = await testAndLoad();
+  if (ok) {
+    setModalStatus('Conectado! Progresso carregado.', 'ok');
+    setTimeout(closeModal, 1400);
+  }
+}
+
+function disconnectGitHub() {
+  localStorage.removeItem('gh_pat');
+  lastSha = null;
+  setSyncState('off', 'GitHub');
+  closeModal();
+}
+
+function setModalStatus(msg, type) {
+  const el = document.getElementById('modal-status');
+  el.textContent = msg;
+  el.className = 'modal-status' + (type ? ' ' + type : '');
+}
+
+// ── Carregar progresso do GitHub ─────────────────────────────────
+async function loadFromGitHub() {
+  if (!GH.token) return false;
+  try {
+    const res = await fetch(GH.api + '?ref=' + GH.branch, {
+      headers: { Authorization: 'token ' + GH.token, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (res.status === 404) return true;   // arquivo ainda não existe, tudo bem
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    lastSha = data.sha;
+    const content = JSON.parse(atob(data.content.replace(/\n/g, '')));
+    // Mesclar: GitHub prevalece sobre localStorage
+    state.stories      = new Set(content.stories      || []);
+    state.intelligence = new Set(content.intelligence || []);
+    state.challenges   = new Set(content.challenges   || []);
+    state.disguises    = new Set(content.disguises    || []);
+    // Persistir localmente também
+    saveStateLocal();
+    return true;
+  } catch(e) {
+    console.warn('GitHub load error:', e);
+    return false;
+  }
+}
+
+// ── Salvar progresso no GitHub ───────────────────────────────────
+async function saveToGitHub() {
+  if (!GH.token) return;
+  setSyncState('syncing', 'Salvando...');
+  try {
+    const payload = {
+      stories:      [...state.stories],
+      intelligence: [...state.intelligence],
+      challenges:   [...state.challenges],
+      disguises:    [...state.disguises],
+      updated_at:   new Date().toISOString()
+    };
+    const body = {
+      message: 'chore: update progress ' + new Date().toISOString().slice(0,16).replace('T',' '),
+      content:  btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2)))),
+      branch:   GH.branch
+    };
+    if (lastSha) body.sha = lastSha;
+    const res = await fetch(GH.api, {
+      method:  'PUT',
+      headers: { Authorization: 'token ' + GH.token, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    lastSha = data.content.sha;
+    setSyncState('ok', 'Salvo');
+    setTimeout(() => setSyncState('ok', 'GitHub'), 2500);
+  } catch(e) {
+    console.warn('GitHub save error:', e);
+    setSyncState('err', 'Erro');
+    setTimeout(() => setSyncState('err', 'GitHub'), 3000);
+  }
+}
+
+// ── Debounce: espera 1.5s depois da última alteração para salvar ─
+function scheduleSave() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(saveToGitHub, 1500);
+}
+
+// ── Testar token e carregar ───────────────────────────────────────
+async function testAndLoad() {
+  setSyncState('syncing', 'Conectando...');
+  const ok = await loadFromGitHub();
+  if (ok) {
+    setSyncState('ok', 'GitHub');
+    renderAll();
+  } else {
+    setSyncState('err', 'Erro');
+    setModalStatus('Token inválido ou sem permissão no repositório.', 'err');
+  }
+  return ok;
+}
+
+function renderAll() {
+  renderStories();
+  renderIntelligence();
+  renderChallenges('');
+  renderDisguises();
+  updateProgress();
+  updateHomeProgress();
+}
+
+// ── INIT ──
+loadState();
+renderStories();
+renderIntelligence();
+renderChallenges('');
+renderDisguises();
+updateProgress();
+updateHomeProgress();
+// Inicializar sync GitHub
+(async () => {
+  if (GH.token) {
+    setSyncState('syncing', 'Carregando...');
+    try {
+      const ok = await loadFromGitHub();
+      if (ok) {
+        setSyncState('ok', 'GitHub');
+      } else {
+        setSyncState('err', 'Erro');
+      }
+    } catch(e) {
+      setSyncState('err', 'Erro');
+    } finally {
+      // renderAll sempre roda, com dados do GitHub ou do localStorage
+      renderAll();
+    }
+  } else {
+    setSyncState('off', 'GitHub');
+  }
+})();
+</script>
+
+<!-- ── GITHUB SYNC MODAL ── -->
+<div class="modal-bg" id="sync-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Sincronização</div>
+    <p class="modal-sub">
+      O progresso é salvo em <strong style="color:var(--text-muted)">progress.json</strong> no seu repositório do GitHub.<br><br>
+      Gere um token em <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens</a> com permissão <strong>repo</strong> (ou <strong>public_repo</strong> se o repositório for público).
+    </p>
+    <label class="modal-label" for="token-input">Personal Access Token</label>
+    <input class="modal-input" id="token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false"/>
+    <div class="modal-row">
+      <button class="modal-btn modal-btn-save" onclick="saveToken()">Salvar e Conectar</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+    <div class="modal-status" id="modal-status"></div>
+    <div class="modal-divider"></div>
+    <button class="modal-danger" onclick="disconnectGitHub()">Desconectar e apagar token</button>
+  </div>
+</div>
+
+<!-- ── SYNC INDICATOR ── -->
+<div class="sync-indicator" id="sync-indicator" onclick="openModal()" title="Sincronização com GitHub">
+  <div class="sync-dot off" id="sync-dot"></div>
+  <span class="sync-lbl" id="sync-lbl">GitHub</span>
+</div>
+
+</body>
+</html>
