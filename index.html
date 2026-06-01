@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HITMAN — World of Assassination</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red: #c8102e;
+      --red-dark: #8b0000;
+      --red-glow: rgba(200,16,46,0.35);
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --bg: #141414;
+      --bg2: #1a1a1a;
+      --bg3: #222222;
+      --border: #2a2a2a;
+      --border-light: #3a3a3a;
+      --text: #ffffff;
+      --text-muted: #d0d0d0;
+      --text-dim: #a0a0a0;
+      --white: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── PAGES ─── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ─── HOME PAGE ─── */
+    #home {
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .home-header {
+      text-align: center;
+      padding: 60px 20px 20px;
+      position: relative;
+    }
+
+    .home-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, transparent, var(--red));
+    }
+
+    .logo-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(28px, 5vw, 56px);
+      letter-spacing: 0.18em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .logo-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 300;
+      font-size: clamp(11px, 2vw, 14px);
+      letter-spacing: 0.45em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .divider-line {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--red), transparent);
+      margin: 20px auto;
+    }
+
+    .missions-section {
+      padding: 20px 40px 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.4em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .missions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+    }
+
+    .mission-card {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      background: var(--bg3);
+    }
+
+    .mission-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.85) 0%,
+        rgba(0,0,0,0.3) 40%,
+        rgba(0,0,0,0.1) 100%
+      );
+      transition: background 0.4s;
+    }
+
+    .mission-card:hover::after {
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.7) 0%,
+        rgba(0,0,0,0.1) 100%
+      );
+    }
+
+    .mission-card:hover .mission-card-border {
+      opacity: 1;
+    }
+
+    .mission-card-border {
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--red);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .mission-card-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 20px var(--red-glow);
+    }
+
+    .mission-cover {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+      display: block;
+    }
+
+    .mission-card:hover .mission-cover { transform: scale(1.05); }
+
+    .mission-card-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 16px 20px;
+      z-index: 5;
+    }
+
+    .mission-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .mission-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .mission-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    .progress-bar-wrap {
+      margin-top: 8px;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--red);
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    .progress-label {
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ─── MISSION PAGE ─── */
+    #mission {
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    .mission-hero {
+      position: relative;
+      height: 60vh;
+      min-height: 360px;
+      overflow: hidden;
+    }
+
+    .mission-hero-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+    }
+
+    .mission-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.3) 0%,
+        rgba(0,0,0,0.5) 50%,
+        rgba(0,0,0,0.95) 100%
+      );
+    }
+
+    .hero-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 40px 60px;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 30px; left: 40px;
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none; background: none;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+
+    .back-btn::before {
+      content: '←';
+      font-size: 16px;
+    }
+
+    .back-btn:hover { color: var(--white); }
+
+    .hero-mission-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.45em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .hero-mission-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      text-transform: uppercase;
+      line-height: 0.95;
+    }
+
+    .hero-mission-location {
+      font-size: 17px;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      margin-top: 10px;
+    }
+
+    /* ─── CONTENT AREA ─── */
+    .mission-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+    }
+
+    /* ─── SUMMARY ─── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 40px 0;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 700px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .hero-content { padding: 30px 20px; }
+      .mission-content { padding: 0 20px 60px; }
+    }
+
+    .summary-block {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+    }
+
+    .summary-block:last-child { border-right: none; }
+
+    .summary-block-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .summary-block p {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      text-align: justify;
+      text-align-last: left;
+    }
+
+    .target-tag, .objective-tag {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 3px 10px;
+      margin: 3px 3px 3px 0;
+      text-transform: uppercase;
+    }
+
+    .target-tag {
+      background: rgba(200,16,46,0.15);
+      border: 1px solid rgba(200,16,46,0.4);
+      color: #ff6b7a;
+    }
+
+    .objective-tag {
+      background: rgba(201,168,76,0.12);
+      border: 1px solid rgba(201,168,76,0.35);
+      color: var(--gold-light);
+    }
+
+    /* ─── INDEX / TOC ─── */
+    .toc-section {
+      margin: 30px 0 10px;
+    }
+
+    .toc-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .toc-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .toc-list a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .toc-list a:hover {
+      color: var(--white);
+      border-color: var(--red);
+      background: rgba(200,16,46,0.08);
+    }
+
+    /* ─── SECTION BLOCKS ─── */
+    .data-section {
+      margin: 32px 0;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: var(--bg3);
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+
+    .section-header:hover { background: #222; }
+
+    .section-header-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    .section-type-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      padding: 3px 8px;
+      text-transform: uppercase;
+    }
+
+    .badge-stories { background: rgba(200,16,46,0.2); color: var(--red); border: 1px solid rgba(200,16,46,0.3); }
+    .badge-intel { background: rgba(100,160,220,0.15); color: #7ab3e0; border: 1px solid rgba(100,160,220,0.25); }
+    .badge-challenges { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.25); }
+    .badge-disguises { background: rgba(120,200,120,0.12); color: #8dd98d; border: 1px solid rgba(120,200,120,0.2); }
+
+    .section-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .section-count {
+      font-size: 15px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .section-progress-inline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .section-progress-inline span { color: var(--red); }
+
+    .chevron {
+      color: var(--text-dim);
+      font-size: 14px;
+      transition: transform 0.3s;
+      display: inline-block;
+    }
+
+    .section-header.open .chevron { transform: rotate(180deg); }
+
+    .section-body {
+      display: none;
+    }
+
+    .section-body.open { display: block; }
+
+    /* ─── STORIES TABLE ─── */
+    .stories-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .story-card {
+      display: grid;
+      grid-template-columns: 280px 1fr auto;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding: 28px 28px;
+      gap: 28px;
+      transition: background 0.2s;
+    }
+
+    .story-card:hover { background: rgba(255,255,255,0.02); }
+
+    .story-img {
+      width: 280px; height: 158px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      flex-shrink: 0;
+    }
+
+    .story-info {}
+
+    .story-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .story-subtitle {
+      font-size: 15px;
+      color: var(--red);
+      letter-spacing: 0.08em;
+      font-style: italic;
+      margin: 4px 0 8px;
+    }
+
+    .story-desc {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      text-align: justify;
+      text-align-last: left;
+    }
+
+    /* ─── INTEL TABLE ─── */
+    .intel-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .intel-table th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 12px 16px;
+      text-align: left;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .intel-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .intel-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+    .intel-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .intel-desc { color: var(--text-muted); text-align: justify; text-align-last: left; }
+
+    /* ─── CHALLENGES TABLE ─── */
+    .challenge-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .challenge-table th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 12px 14px;
+      text-align: left;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .challenge-table td {
+      padding: 16px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      font-size: 16px;
+    }
+
+    .challenge-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+    .challenge-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .challenge-img {
+      width: 140px; height: 140px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .challenge-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .type-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      padding: 4px 10px;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .type-A { background: rgba(200,16,46,0.2); color: #ff6b7a; border: 1px solid rgba(200,16,46,0.3); }
+    .type-D { background: rgba(100,200,255,0.12); color: #7ad4ff; border: 1px solid rgba(100,200,255,0.2); }
+    .type-F { background: rgba(255,200,100,0.12); color: #ffd580; border: 1px solid rgba(255,200,100,0.2); }
+    .type-T { background: rgba(200,100,255,0.12); color: #d580ff; border: 1px solid rgba(200,100,255,0.2); }
+    .type-TC { background: rgba(100,255,180,0.1); color: #80ffc0; border: 1px solid rgba(100,255,180,0.2); }
+    .type-CN { background: rgba(255,150,50,0.12); color: #ffaa60; border: 1px solid rgba(255,150,50,0.2); }
+
+    .challenge-desc { color: var(--text-muted); line-height: 1.55; text-align: justify; text-align-last: left; }
+    .challenge-desc-cell { max-width: 360px; }
+
+    .xp-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .reward-item-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .reward-item-img {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      border: 1px solid var(--gold);
+      background: var(--bg3);
+      display: block;
+    }
+
+    .reward-item-name {
+      font-size: 13px;
+      color: var(--gold-light);
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* ─── DISGUISES GRID ─── */
+    .disguises-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .disguise-card {
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s;
+    }
+
+    .disguise-card:hover { background: rgba(255,255,255,0.025); }
+
+    .disguise-img {
+      width: 150px; height: 150px;
+      object-fit: cover;
+      object-position: top center;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      display: block;
+    }
+
+    .disguise-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* ─── CHECKBOX ─── */
+    .check-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .custom-check {
+      width: 20px; height: 20px;
+      border: 1.5px solid var(--border-light);
+      background: transparent;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .custom-check:hover {
+      border-color: var(--red);
+      background: rgba(200,16,46,0.1);
+    }
+
+    .custom-check.checked {
+      border-color: var(--red);
+      background: var(--red);
+    }
+
+    .custom-check.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    /* completed row state */
+    tr.completed td { opacity: 0.45; }
+    .story-card.completed { opacity: 0.45; }
+    .disguise-card.completed .disguise-name { color: var(--text-dim); }
+    .disguise-card.completed .disguise-img { filter: grayscale(1) opacity(0.5); }
+
+    /* ─── FILTER BAR ─── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--red);
+      color: var(--white);
+      background: rgba(200,16,46,0.12);
+    }
+
+    /* ─── RESPONSIVE TABLE SCROLL ─── */
+    .table-scroll { overflow-x: auto; }
+
+    /* ─── SCROLL TO TOP ─── */
+    .scroll-indicator {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      width: 40px; height: 40px;
+      border: 1px solid var(--border-light);
+      background: var(--bg3);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      font-size: 16px;
+      transition: all 0.2s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .scroll-indicator.visible {
+      opacity: 1; pointer-events: all;
+    }
+
+    .scroll-indicator:hover {
+      border-color: var(--red);
+      color: var(--white);
+    }
+
+    /* ─── IMG FALLBACK ─── */
+    img { color: transparent; }
+    img.broken { background: #1c1c1c; }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ HOME PAGE ═══════════════════════════════════════════ -->
+<div id="home" class="page active">
+  <div class="home-header">
+    <div class="logo-text">HITMAN</div>
+    <div class="logo-sub">World of Assassination &mdash; Mission Tracker</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="missions-section">
+    <div class="section-label">Select Mission</div>
+    <div class="missions-grid">
+
+      <!-- MISSION 5 — ANOTHER LIFE -->
+      <div class="mission-card" onclick="openMission('another-life')">
+        <div class="mission-card-border"></div>
+        <img class="mission-cover" src="AnotherLife_COVER.jpg" alt="Another Life Cover" onerror="this.classList.add('broken')"/>
+        <div class="mission-card-info">
+          <div class="mission-number">Mission 05</div>
+          <div class="mission-title">Another Life</div>
+          <div class="mission-subtitle">Whittleton Creek, Vermont, USA</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="home-progress-bar"></div>
+          </div>
+          <div class="progress-label" id="home-progress-label">0% COMPLETE</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ MISSION PAGE ═══════════════════════════════════════════ -->
+<div id="mission" class="page">
+
+  <!-- HERO -->
+  <div class="mission-hero">
+    <img class="mission-hero-img" src="AnotherLife_COVER.jpg" alt="Another Life"/>
+    <div class="mission-hero-overlay"></div>
+    <button class="back-btn" onclick="goHome()">Voltar</button>
+    <div class="hero-content">
+      <div class="hero-mission-num">Mission 05 &mdash; Hitman 2</div>
+      <div class="hero-mission-title">Another Life</div>
+      <div class="hero-mission-location">Whittleton Creek &middot; Vermont, USA</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="mission-content">
+
+    <!-- SUMMARY -->
+    <div class="summary-grid">
+      <div class="summary-block" style="grid-column: span 2; border-right: none; border-bottom: 1px solid var(--border);">
+        <div class="summary-block-label">Briefing</div>
+        <p>Another Life is the fifth mission in HITMAN 2. Agent 47 enters the quiet suburbia of Whittleton Creek, Vermont, USA, in order to ascertain clues to tracking down The Constant in his predecessor Janus' home and surrounding neighbourhood. He must also cover his tracks by eliminating Janus and the head of his security detail, Nolan Cassidy.</p>
+      </div>
+      <div class="summary-block">
+        <div class="summary-block-label">Targets</div>
+        <span class="target-tag">Janus</span>
+        <span class="target-tag">Nolan Cassidy</span>
+      </div>
+      <div class="summary-block">
+        <div class="summary-block-label">Objectives</div>
+        <span class="objective-tag">Find Clues</span>
+        <span class="objective-tag">Eliminate Targets</span>
+      </div>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc-section">
+      <div class="toc-title">Índice</div>
+      <ul class="toc-list">
+        <li><a href="#sec-stories" onclick="expandSection('sec-stories')">Mission Stories</a></li>
+        <li><a href="#sec-intel" onclick="expandSection('sec-intel')">Intelligence</a></li>
+        <li><a href="#sec-challenges" onclick="expandSection('sec-challenges')">Challenges</a></li>
+        <li><a href="#sec-disguises" onclick="expandSection('sec-disguises')">Disguises</a></li>
+      </ul>
+    </div>
+
+    <!-- ─── MISSION STORIES ─── -->
+    <div class="data-section" id="sec-stories">
+      <div class="section-header open" onclick="toggleSection(this, 'body-stories')">
+        <div class="section-header-left">
+          <span class="section-type-badge badge-stories">Stories</span>
+          <span class="section-name">Mission Stories</span>
+          <span class="section-count">7 itens</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="section-progress-inline" id="prog-stories"><span>0</span> / 7</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body open" id="body-stories">
+        <div class="stories-grid" id="stories-container"></div>
+      </div>
+    </div>
+
+    <!-- ─── INTELLIGENCE ─── -->
+    <div class="data-section" id="sec-intel">
+      <div class="section-header open" onclick="toggleSection(this, 'body-intel')">
+        <div class="section-header-left">
+          <span class="section-type-badge badge-intel">Intel</span>
+          <span class="section-name">Intelligence</span>
+          <span class="section-count">45 itens</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="section-progress-inline" id="prog-intel"><span>0</span> / 45</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body open" id="body-intel">
+        <div class="table-scroll">
+          <table class="intel-table" id="intel-table">
+            <thead>
+              <tr>
+                <th style="width:28px;">✓</th>
+                <th>Título</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody id="intel-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── CHALLENGES ─── -->
+    <div class="data-section" id="sec-challenges">
+      <div class="section-header open" onclick="toggleSection(this, 'body-challenges')">
+        <div class="section-header-left">
+          <span class="section-type-badge badge-challenges">Challenges</span>
+          <span class="section-name">Challenges</span>
+          <span class="section-count">82 itens</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="section-progress-inline" id="prog-challenges"><span>0</span> / 82</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body open" id="body-challenges">
+        <div class="filter-bar" id="challenge-filters">
+          <button class="filter-btn active" onclick="filterChallenges(this, '')">Todos</button>
+          <button class="filter-btn" onclick="filterChallenges(this, 'A')"><span class="type-badge type-A">A</span> Assassinato</button>
+          <button class="filter-btn" onclick="filterChallenges(this, 'D')"><span class="type-badge type-D">D</span> Descoberta</button>
+          <button class="filter-btn" onclick="filterChallenges(this, 'F')"><span class="type-badge type-F">F</span> Feito</button>
+          <button class="filter-btn" onclick="filterChallenges(this, 'T')"><span class="type-badge type-T">T</span> Target</button>
+          <button class="filter-btn" onclick="filterChallenges(this, 'TC')"><span class="type-badge type-TC">TC</span> Clássico</button>
+          <button class="filter-btn" onclick="filterChallenges(this, 'CN')"><span class="type-badge type-CN">CN</span> Contrato</button>
+        </div>
+        <div class="table-scroll">
+          <table class="challenge-table">
+            <thead>
+              <tr>
+                <th style="width:28px;">✓</th>
+                <th style="width:160px;">Challenge</th>
+                <th style="width:80px;">Tipo</th>
+                <th class="challenge-desc-cell">Descrição</th>
+                <th style="width:80px;">XP</th>
+                <th style="width:130px;">Recompensa</th>
+              </tr>
+            </thead>
+            <tbody id="challenge-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── DISGUISES ─── -->
+    <div class="data-section" id="sec-disguises">
+      <div class="section-header open" onclick="toggleSection(this, 'body-disguises')">
+        <div class="section-header-left">
+          <span class="section-type-badge badge-disguises">Disguises</span>
+          <span class="section-name">Disguises</span>
+          <span class="section-count">21 itens</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="section-progress-inline" id="prog-disguises"><span>0</span> / 21</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="section-body open" id="body-disguises">
+        <div class="disguises-grid" id="disguises-container"></div>
+      </div>
+    </div>
+
+  </div><!-- /mission-content -->
+</div><!-- /mission page -->
+
+<div class="scroll-indicator" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const DATA = {
+  stories: [
+    { title: 'Charbroiled', subtitle: 'Dish best served cold.', desc: "The Wilsons are throwing a BBQ and everyone's invited. It sounds like Nolan Cassidy has some interest in the party as well but for some reason he's unwilling to go inside. Maybe you can help fix whatever's wrong in there, 47?", img: 'Stories/Stories_Charbroiled_Tile.jpg' },
+    { title: 'Pest Control', subtitle: 'Sleep tight.', desc: 'Apparently there is a fumigator in town. He\'s working on a house belonging to a "James Batty" and has previously been working on Cassidy\'s house. The fumigator has stored some of his chemicals, a strong sedative, in a container in a vacant lot near the creek. Sounds like this could be useful, 47.', img: 'Stories/Stories_Pest_Control_Tile.jpg' },
+    { title: 'House for Sale', subtitle: 'Everything must go.', desc: "A realtor with a taste for the sweet things in life is in Whittleton Creek to show a house to Nolan Cassidy. It looks like he's stuck at a local muffin stand at the moment. It would be a shame to keep Cassidy waiting, wouldn't it?", img: 'Stories/Stories_House_For_Sale_Tile.jpg' },
+    { title: 'Breadcrumb Trail', subtitle: 'Follow the leads.', desc: "Hm, a lawsuit between Janus and another resident? Might be a good place to start your investigation into Janus' life, 47. I suggest you look closer at this James Batty fellow.", img: 'Stories/Stories_Breadcrumb_Trail_Tile.jpg' },
+    { title: 'An Apple a Day', subtitle: 'Weekly visits for the health.', desc: "Janus has an appointment with a male nurse every Saturday. He's down feeding the birds by the creek at the moment. Sounds like a good way inside Janus' house.", img: 'Stories/Stories_An_Apple_A_Day_Tile.jpg' },
+    { title: 'Whack-A-Mole', subtitle: 'Secret underground network.', desc: "One of Janus' gardeners has decided to clear a series of mole tunnels using explosives. I applaud his enthusiasm, but sadly local police have confiscated his equipment. If you were to find it, 47, it might be the perfect way to rid the world of Janus.", img: 'Stories/Stories_Whack-A-Mole_Tile.jpg' },
+    { title: 'No Smoking Area', subtitle: 'Smoking kills.', desc: "So, Janus smokes despite being dependent on an oxygen tank and his bodyguards' insistence on hiding his cigarettes. I wonder what might happen if he combined the two?", img: 'Stories/Stories_No_Smoking_Area_Tile.jpg' },
+  ],
+
+  intelligence: [
+    { title: 'A Distant Memory', desc: '"Janus likes to tell stories from his past. Maybe you can trigger some of the more interesting ones?"' },
+    { title: 'A Handwritten Letter', desc: 'A Handwritten Letter' },
+    { title: 'A Lawsuit?', desc: '"A lawsuit between Janus and one of the other residents in Whittleton Creek? Sounds promising."' },
+    { title: 'A Quick Read', desc: 'A Quick Read' },
+    { title: 'A Robe', desc: '"Helen West, neighbor to Janus, has been repairing an old robe of his. A note attached to it indicates that Janus has a great need for the robe soon as he\'s going to some sort of event where the robe is required."' },
+    { title: 'An Old Diary', desc: 'An Old Diary' },
+    { title: "Batty's Door Note", desc: '"I\'m in the garden. Ring the doorbell if you need me, then I\'ll be right out. James Batty."' },
+    { title: "Batty's House Key", desc: "Batty's House Key" },
+    { title: 'Buried Secrets', desc: '"One of Janus\' security guards buried something in the frog habitat behind Cassidy\'s house. Why?"' },
+    { title: "Cassidy's House Key", desc: "Cassidy's House Key" },
+    { title: 'Construction Van Key', desc: '"A key. Unlocks the van exit in the Construction Area."' },
+    { title: 'Find Clues', desc: 'Find Clues' },
+    { title: 'Follow the Leads', desc: '"Hm, a lawsuit between Janus and another resident? Might be a good place to start your investigation into Janus\' life, 47. I suggest you look closer at this James Batty fellow."' },
+    { title: "Frank Schmidt's Bedroom Key", desc: "Frank Schmidt's Bedroom Key" },
+    { title: "Frank Schmidt's House Key", desc: '"A key. Opens all the doors on the For Sale property."' },
+    { title: 'Free Burgers', desc: 'Free Burgers' },
+    { title: "Hanson's House Key", desc: '"A key. Opens all the doors on the Hanson\'s property."' },
+    { title: 'Hidden Microfilm', desc: 'Hidden Microfilm' },
+    { title: 'Hidden Tapes', desc: '"A surveillance tape, which could hold interesting information."' },
+    { title: 'In Honor of West', desc: 'In Honor of West' },
+    { title: "Janus' Cigarettes", desc: '"One of Janus\' guards has apparently tossed his cigarettes over the fence into another back yard. Janus is using an oxygen apparatus to help him breathe better and the guard is trying to keep Janus alive."' },
+    { title: "Janus' House Key", desc: "Janus' House Key" },
+    { title: "Janus' Memory", desc: '"Playing a piece of music in Janus\' house triggered a recent memory of himself and the Constant. Apparently, he handed over the role as Constant one evening in an empty concert hall. The two still meet up and are scheduled to see each other soon."' },
+    { title: "Janus' Microfilm", desc: "Janus' Microfilm" },
+    { title: "Janus' Old Photograph", desc: '"Evidence found in his basement indicates that Janus attends an annual gathering of "The Ark Society"."' },
+    { title: 'Lawsuit Documents', desc: 'Lawsuit Documents' },
+    { title: 'Microfilm', desc: '"A microfilm containing an extensive set of minutes from some sort of recurring meeting gives a strong indication of when Janus might leave Whittleton Creek."' },
+    { title: 'Note for Real Estate Company', desc: 'Note for Real Estate Company' },
+    { title: 'Pack of Cigarettes', desc: '"A pack of cigarettes."' },
+    { title: 'Political Flyer', desc: 'Political Flyer' },
+    { title: 'Public Shed Key', desc: '"A key. Opens all public sheds in Whittleton Creek."' },
+    { title: 'Return to Sender', desc: 'Return to Sender' },
+    { title: 'Roadwork Gate Key', desc: '"A key. Unlocks the gate exit in the Roadwork Area."' },
+    { title: 'Robe', desc: 'Robe' },
+    { title: 'Surveillance Tape [Intel]', desc: '"A recording confirms that Janus and the Constant are planning on meeting soon."' },
+    { title: 'Surveillance Tape [Item]', desc: 'Surveillance Tape [Item]' },
+    { title: 'The Fumigator', desc: '"A local fumigator is working on the Batty house after having finished work on Cassidy\'s house. Apparently, he\'s storing his chemicals in a construction container nearby."' },
+    { title: 'The Lost Photograph', desc: 'The Lost Photograph' },
+    { title: 'The Nurse', desc: '"It seems Janus has a male nurse who comes by to perform a health check on him every Saturday. The nurse has a fondness for the local birds and can be found near the creek, feeding the animals."' },
+    { title: 'The Salesman', desc: 'The Salesman' },
+    { title: 'Uninvited Guests', desc: '"Janus has uninvited guests in the form of several moles that have been digging tunnels around his back yard. A gardener is there to help fix the problem but his explosives, which he intended to use to collapse the tunnels with, have been confiscated by the local police."' },
+    { title: 'Vault Keycard', desc: 'Vault Keycard' },
+    { title: "West's House Key", desc: '"A key. Opens all the doors on West\'s property."' },
+    { title: 'Whittleton Creek Pikes', desc: 'Whittleton Creek Pikes' },
+    { title: "Wilsons' House Key", desc: '"A key. Opens all the doors on the Wilsons\' property."' },
+  ],
+
+  challenges: [
+    { name: 'Public Enemy', type: 'A', desc: 'Eliminate Janus and Nolan Cassidy with an SMG or an Assault Rifle.', xp: '+4000XP', item: 'The Public Enemy Suit', itemImg: 'Challenges/ItemReward_The_Public_Enemy_Suit.jpg', img: 'Challenges/Public_Enemy_WoA.jpg' },
+    { name: 'Unreasonable Scope', type: 'A', desc: 'Eliminate all targets with one shot with a sniper rifle from the tree house in the Schmidt garden.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Unreasonable_Scope_Challenge.jpg' },
+    { name: 'Big Boom', type: 'A', desc: 'Eliminate both targets in a single explosion.', xp: '+4000XP', item: 'The Party Cracker', itemImg: 'Challenges/ItemReward_The_Party_Cracker.jpg', img: 'Challenges/Big_Boom_Challenge.jpg' },
+    { name: 'Monster Cookie', type: 'A', desc: 'Eliminate Janus with poisoned food.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Monster_Cookie.jpg' },
+    { name: 'Sneezing Suspicion', type: 'A', desc: 'Eliminate Janus by letting him smoke near a leaking explosive tank.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Sneezing_Suspicion.jpg' },
+    { name: 'Sold!', type: 'A', desc: 'Eliminate Nolan Cassidy using the security system in the "For Sale" basement.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Sold21.jpg' },
+    { name: 'Doable Scope', type: 'A', desc: 'Eliminate a target with a sniper rifle from the tree house in the Schmidt garden.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Doable_Scope_Challenge.jpg' },
+    { name: 'Explosive Potential', type: 'A', desc: 'Eliminate a target in an accident by dropping something heavy onto them or blowing them up.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Explosive_Potential.jpg' },
+    { name: 'Finger on the Pulse', type: 'A', desc: 'Eliminate Janus by smothering him with a pillow during his health check.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Finger_on_the_Pulse.jpg' },
+    { name: 'Tea Time', type: 'A', desc: 'Eliminate Janus with a poisoned drink.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Tea_Time_Whittleton_Creek.jpg' },
+    { name: 'Death from Below', type: 'A', desc: 'Eliminate Janus in an explosion from a mole hole.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Death_from_Below.jpg' },
+    { name: 'A Buffet to You, Sir', type: 'A', desc: "Eliminate Nolan Cassidy in the Wilson's toilet after having poisoned him.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/A_Buffet_to_You2C_Sir.jpg' },
+    { name: 'Reasonable Scope', type: 'A', desc: 'Kill all targets with a sniper rifle from the tree house in the Schmidt garden.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Reasonable_Scope_Challenge.jpg' },
+    { name: 'Pass Gas', type: 'A', desc: "Eliminate Nolan Cassidy using the exterminator's fumigation machine.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Pass_Gas.jpg' },
+    { name: 'Memorabilia', type: 'A', desc: 'Eliminate Janus by impaling him on the hammer & sickle sculpture in his basement.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Memorabilia.jpg' },
+    { name: 'Whittleton Creek Electric', type: 'A', desc: 'Kill any target with electricity.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Whittleton_Creek_Electric.jpg' },
+    { name: 'Tasteless, Traceless', type: 'A', desc: 'Assassinate a target with lethal poison in Whittleton Creek.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Tasteless_H3.jpg' },
+    { name: 'Straight Shot', type: 'A', desc: 'Assassinate a target with a headshot in Whittleton Creek.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Straight_Shot_H3.jpg' },
+    { name: 'Sweet Recycling', type: 'A', desc: 'Eliminate a target with the garbage truck while disguised as a Server.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Sweet_Recycling_New.jpg' },
+    { name: 'Versatile Assassin', type: 'A', desc: 'Complete the following Versatile challenges in Whittleton Creek:\nPiano Man\nSomeone Could Hurt Themselves\nHold My Hair\nStraight Shot\nTasteless, Traceless', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Versatile_H3.jpg' },
+    { name: 'Someone Could Hurt Themselves', type: 'A', desc: 'Assassinate a target in an accident in Whittleton Creek.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Someone_Could_Hurt_Themselves.jpg' },
+    { name: 'Piano Man', type: 'A', desc: 'Assassinate a target with the fiber wire in Whittleton Creek.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Piano_Man_H3.jpg' },
+    { name: 'Hold My Hair', type: 'A', desc: 'Assassinate a target by drowning them in Whittleton Creek.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Hold_My_Hair.jpg' },
+    { name: 'Whittleton Creek Blackout', type: 'A', desc: 'Eliminate both targets with electricity.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Whittleton_Creek_Blackout.jpg' },
+    { name: 'Providence', type: 'D', desc: 'Find clues.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Providence.jpg' },
+    { name: 'Become the Nurse', type: 'D', desc: 'Disguise yourself as the Nurse.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_the_Nurse.jpg' },
+    { name: "They See Me Paddlin'", type: 'D', desc: 'Use a raft to exit the mission.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/They_See_Me_Paddlin27.jpg' },
+    { name: 'Become James Batty', type: 'D', desc: 'Disguise yourself as James Batty.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_James_Batty.jpg' },
+    { name: 'Become the Mailman', type: 'D', desc: 'Disguise yourself as the Mailman.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_the_Mailman.jpg' },
+    { name: 'Discover Whittleton Creek', type: 'D', desc: 'Reveal all undiscovered areas in Whittleton Creek.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Discover_Whittleton_Creek.jpg' },
+    { name: 'Cowabunga!', type: 'D', desc: 'Use a manhole to exit the mission.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Cowabunga21.jpg' },
+    { name: 'Become the BBQ King', type: 'D', desc: 'Disguise yourself as Richard Wilson, the BBQ King.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_the_BBQ_King.jpg' },
+    { name: 'Remember to Recycle', type: 'D', desc: 'Use a trash truck to exit the mission.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Remember_to_Recycle.jpg' },
+    { name: 'Become the Exterminator', type: 'D', desc: 'Disguise yourself as the Exterminator.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_the_Exterminator.jpg' },
+    { name: 'Wear the Robe', type: 'D', desc: "Obtain the Robe disguise from Helen's house.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Wear_the_Robe.jpg' },
+    { name: 'Clocked Out', type: 'D', desc: 'Use the roadwork gate to exit the mission.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Clocked_Out.jpg' },
+    { name: 'You Must be Trucking', type: 'D', desc: 'Use the construction van to exit the mission.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/You_Must_be_Trucking.jpg' },
+    { name: 'Doing the Rounds', type: 'D', desc: 'Deliver 5 newspapers to mailboxes.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Doing_The_Rounds.jpg' },
+    { name: 'Become the Politician', type: 'D', desc: 'Disguise yourself as the Politician.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_the_Politician.jpg' },
+    { name: 'Chameleon', type: 'D', desc: 'Find and equip all disguises in Whittleton Creek.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Chameleon_H3.jpg' },
+    { name: 'Become the Real Estate Broker', type: 'D', desc: 'Disguise yourself as the Real Estate Broker.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Become_the_Real_Estate_Broker.jpg' },
+    { name: 'Mission Story - An Apple a Day', type: 'F', desc: "Become Janus' personal nurse and infiltrate his home.", xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/An_Apple_A_Day_Tile.jpg' },
+    { name: 'Ring Whittleton Creek', type: 'F', desc: 'Distract a resident with a doorbell.\nSneak into their home while they are distracted.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Ring_Whittleton_Creek.jpg' },
+    { name: 'Priceless', type: 'F', desc: "Deliver the package for Mr. Batty.\nThen find a way to make him go batty.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Priceless.jpg' },
+    { name: 'Mission Story - House for Sale', type: 'F', desc: 'Go house hunting with Nolan Cassidy in Whittleton Creek.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/House_For_Sale_Tile.jpg' },
+    { name: 'Wet Bandit', type: 'F', desc: 'Dump a target down a manhole.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Wet_Bandit.jpg' },
+    { name: 'Mission Story - Whack-a-Mole', type: 'F', desc: 'Secret underground network.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Whack-A-Mole_Tile.jpg' },
+    { name: 'Friendly Neighborhood Hitman', type: 'F', desc: 'Complete "Stuffed", "Early Birdy" and "Snail Mail".', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Friendly_Neighborhood_Hitman.jpg' },
+    { name: 'Snail Mail', type: 'F', desc: 'Help the mailman by delivering the package to Mr. Batty.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Snail_Mail.jpg' },
+    { name: 'Mission Story - Charbroiled', type: 'F', desc: 'Dish best served cold.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Charbroiled_Tile.jpg' },
+    { name: 'Master Detective', type: 'F', desc: 'Find all clues in Whittleton Creek.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Master_Detective.jpg' },
+    { name: 'Tunnel Ducks Rule!', type: 'F', desc: 'Discover the underground tunnel.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/TunnelDucksRule.jpg' },
+    { name: 'They Must Pie', type: 'F', desc: "Dump any character into the oven in Helen West's basement.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/They_Must_Pie.jpg' },
+    { name: 'Battle Frogs', type: 'F', desc: 'Capture a pickerel frog.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Battle_Frogs.jpg' },
+    { name: 'Pickpocket', type: 'F', desc: "Intercept Janus' letter before it is delivered in Cassidy's home.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Pickpocket.jpg' },
+    { name: 'Early Birdy', type: 'F', desc: 'Make the nurse go to Janus\' health check by scaring the ducks.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Early_Birdy.jpg' },
+    { name: 'Extensive Presentation', type: 'F', desc: 'Present every room in the house for sale to Nolan Cassidy.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Extensive_Presentation.jpg' },
+    { name: 'Stuffed', type: 'F', desc: 'Somehow make the Real Estate Agent go to the house showing with Nolan Cassidy... Om nom nom.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Stuffed.jpg' },
+    { name: 'Just a Bite', type: 'F', desc: "Make one of Nolan Cassidy's Bodyguards eat a muffin at the house for sale.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Just_a_Bite.jpg' },
+    { name: 'Walkthrough', type: 'F', desc: "Serve at least 3 people at the Wilson's party disguised as a Server.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Walkthrough.jpg' },
+    { name: 'Propaganda', type: 'F', desc: 'Deliver a political flyer to any mailbox in Whittleton Creek.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Propaganda.jpg' },
+    { name: 'Mission Story - Breadcrumb Trail', type: 'F', desc: 'Investigate Whittleton Creek and track down the Constant.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Breadcrumb_Trail_Tile.jpg' },
+    { name: 'Mission Story - Pest Control', type: 'F', desc: 'Sleep tight.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Pest_Control_Tile.jpg' },
+    { name: 'Upscaled', type: 'F', desc: 'Make a character of Whittleton Creek trigger the singing fish.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Upscaled.jpg' },
+    { name: 'Elderly Assistance', type: 'F', desc: "Figure out a way to make Janus' day.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/ElderlyAssistance.jpg' },
+    { name: 'Mission Story - No Smoking Area', type: 'F', desc: 'Smoking kills.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/No_Smoking_Area_Tile.jpg' },
+    { name: 'Old Grudges', type: 'F', desc: 'Unearth the hatchet.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/OldGrudges.jpg' },
+    { name: 'Sleepy Cake', type: 'F', desc: 'Pacify all the Servers.\nDo not pacify or eliminate Helen West.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Sleepy_Cake_New.jpg' },
+    { name: 'Public Enemy No. 1', type: 'F', desc: "Pacify 3 police deputies.\nDon't let their bodies be found.", xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Public_Enemy_No._1.jpg' },
+    { name: 'Raking it In', type: 'F', desc: 'Make any target step on a rake and become pacified.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Raking_it_In.jpg' },
+    { name: 'Troll Toll', type: 'F', desc: 'Dump a body down the well in the public park.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/Troll_Toll.jpg' },
+    { name: 'Quack? Quack!', type: 'F', desc: 'Quack, quack, quack, quack...', xp: '+2000XP', item: 'The Egg Hunt Suit', itemImg: 'Challenges/ItemReward_Egg_Hunt_Suit.jpg', img: 'Challenges/Quack__Quack!.jpg' },
+    { name: 'You Had Me at Bodyguard', type: 'F', desc: 'Destroy all cameras.', xp: '+2000XP', item: null, itemImg: null, img: 'Challenges/You_Had_Me_at_Bodyguard.jpg' },
+    { name: 'Breaking News', type: 'F', desc: 'Pacify any target with a newspaper.', xp: '+1000XP', item: null, itemImg: null, img: 'Challenges/Breaking_News.jpg' },
+    { name: 'The Past', type: 'T', desc: 'Assassinate Janus.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/The_Past.jpg' },
+    { name: 'The Present', type: 'T', desc: 'Assassinate Nolan Cassidy.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/The_Present.jpg' },
+    { name: 'Silent Assassin, Suit Only', type: 'TC', desc: 'Complete "Another Life".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.\nDo it all in your suit.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/SilentAssassin_SuitOnly.jpg' },
+    { name: 'Silent Assassin', type: 'TC', desc: 'Complete "Another Life".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/SilentAssassin.jpg' },
+    { name: 'Suit Only', type: 'TC', desc: 'Assassinate the targets and complete the mission.\nDo it all in your suit.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/SuitOnly.jpg' },
+    { name: 'Sniper Assassin', type: 'TC', desc: 'Complete "Another Life".\nAssassinate your targets with a sniper rifle.\nOnly eliminate the targets.\nDo not get spotted.\nIf you\'re detected by cameras, erase or destroy the evidence.', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/Sniper_Assassin.jpg' },
+    { name: 'The Classics', type: 'TC', desc: 'Complete all the Classic challenges on "Another Life":\nSilent Assassin\nSilent Assassin, Suit Only\nSniper Assassin\nSuit Only', xp: '+4000XP', item: null, itemImg: null, img: 'Challenges/The_Classics.jpg' },
+    { name: 'Welcome to Business Class', type: 'CN', desc: 'Dressed as a Server, pacify any target in Whittleton Creek by throwing a suitcase at them.', xp: '+2000XP', item: 'Orange Pinstripe Briefcase', itemImg: 'Challenges/ItemReward_Orange_Pinstripe_Briefcase.jpg', img: 'Challenges/Welcome_to_Business_Class_WoA.jpg' },
+  ],
+
+  disguises: [
+    { name: 'Suburban Suit (Starting suit)', img: 'Disguises/Disguise_Suburban_Suit_Tile.jpg' },
+    { name: 'Arkian Robe', img: 'Disguises/Disguise_Arkian_Robe_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'BBQ Owner', img: 'Disguises/Disguise_BBQ_Owner_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Cassidy Bodyguard', img: 'Disguises/Disguise_Cassidy_Bodyguard_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Construction Worker', img: 'Disguises/Disguise_Construction_Worker_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Exterminator', img: 'Disguises/Disguise_Exterminator_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Garbage Man', img: 'Disguises/Disguise_Garbage_Man_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Gardener', img: 'Disguises/Disguise_Gardener_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Gunther Mueller', img: 'Disguises/Disguise_Gunther_Mueller_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'James Batty', img: 'Disguises/Disguise_James_Batty_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: "Janus' Bodyguard", img: 'Disguises/Disguise_Janus27_Bodyguard_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Mailman', img: 'Disguises/Disguise_Mailman_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Nurse', img: 'Disguises/Disguise_Nurse_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Plumber', img: 'Disguises/Disguise_Plumber_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Police Deputy', img: 'Disguises/Disguise_Police_Deputy_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Politician', img: 'Disguises/Disguise_Politician_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: "Politician's Assistant", img: 'Disguises/Disguise_Politician27s_Assistant_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Real Estate Broker', img: 'Disguises/Disguise_Real_Estate_Broker_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Server', img: 'Disguises/Disguise_Server_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Sheriff Masterson', img: 'Disguises/Disguise_Sheriff_Masterson_Outfit_-_Whittleton_Creek.JPG.jpg' },
+    { name: 'Spencer "The Hammer" Green', img: 'Disguises/Disguise_Spencer_22_Green_Outfit_-_Whittleton_Creek.JPG.jpg' },
+  ]
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+const state = {
+  stories: new Set(),
+  intelligence: new Set(),
+  challenges: new Set(),
+  disguises: new Set(),
+};
+
+function saveState() {
+  const s = {
+    stories: [...state.stories],
+    intelligence: [...state.intelligence],
+    challenges: [...state.challenges],
+    disguises: [...state.disguises],
+  };
+  localStorage.setItem('hitman_another_life', JSON.stringify(s));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('hitman_another_life');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    state.stories = new Set(s.stories || []);
+    state.intelligence = new Set(s.intelligence || []);
+    state.challenges = new Set(s.challenges || []);
+    state.disguises = new Set(s.disguises || []);
+  } catch(e) {}
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+
+function mkCheck(category, id) {
+  const isChecked = state[category].has(id);
+  const el = document.createElement('div');
+  el.className = 'check-wrap';
+  const box = document.createElement('div');
+  box.className = 'custom-check' + (isChecked ? ' checked' : '');
+  box.dataset.category = category;
+  box.dataset.id = id;
+  box.onclick = function(e) {
+    e.stopPropagation();
+    toggle(category, id, this);
+  };
+  el.appendChild(box);
+  return el;
+}
+
+function toggle(category, id, boxEl) {
+  if (state[category].has(id)) {
+    state[category].delete(id);
+    boxEl.classList.remove('checked');
+  } else {
+    state[category].add(id);
+    boxEl.classList.add('checked');
+  }
+  saveState();
+  updateRowCompleted(category, id);
+  updateProgress();
+  updateHomeProgress();
+}
+
+function updateRowCompleted(category, id) {
+  const el = document.querySelector(`[data-category="${category}"][data-id="${id}"]`);
+  if (!el) return;
+  const row = el.closest('tr') || el.closest('.story-card') || el.closest('.disguise-card');
+  if (row) {
+    if (state[category].has(id)) row.classList.add('completed');
+    else row.classList.remove('completed');
+  }
+}
+
+// Stories
+function renderStories() {
+  const container = document.getElementById('stories-container');
+  container.innerHTML = '';
+  DATA.stories.forEach((s, i) => {
+    const id = 'story_' + i;
+    const card = document.createElement('div');
+    card.className = 'story-card' + (state.stories.has(id) ? ' completed' : '');
+
+    const img = document.createElement('img');
+    img.className = 'story-img';
+    img.src = s.img;
+    img.alt = s.title;
+    img.onerror = function() { this.classList.add('broken'); this.style.background='#1c1c1c'; };
+
+    const info = document.createElement('div');
+    info.className = 'story-info';
+    info.innerHTML = `<div class="story-title">${s.title}</div>
+      <div class="story-subtitle">${s.subtitle}</div>
+      <div class="story-desc">${s.desc}</div>`;
+
+    const checkEl = mkCheck('stories', id);
+
+    card.appendChild(img);
+    card.appendChild(info);
+    card.appendChild(checkEl);
+    container.appendChild(card);
+  });
+}
+
+// Intelligence
+function renderIntelligence() {
+  const tbody = document.getElementById('intel-body');
+  tbody.innerHTML = '';
+  DATA.intelligence.forEach((item, i) => {
+    const id = 'intel_' + i;
+    const tr = document.createElement('tr');
+    if (state.intelligence.has(id)) tr.classList.add('completed');
+
+    const tdCheck = document.createElement('td');
+    tdCheck.appendChild(mkCheck('intelligence', id));
+
+    const tdTitle = document.createElement('td');
+    tdTitle.innerHTML = `<span class="intel-title">${item.title}</span>`;
+
+    const tdDesc = document.createElement('td');
+    tdDesc.className = 'intel-desc';
+    tdDesc.textContent = item.desc.replace(/^"|"$/g, '').replace(/\\n/g, '\n');
+
+    tr.appendChild(tdCheck);
+    tr.appendChild(tdTitle);
+    tr.appendChild(tdDesc);
+    tbody.appendChild(tr);
+  });
+}
+
+// Challenges
+function renderChallenges(typeFilter) {
+  const tbody = document.getElementById('challenge-body');
+  tbody.innerHTML = '';
+  DATA.challenges.forEach((c, i) => {
+    if (typeFilter && c.type !== typeFilter) return;
+    const id = 'challenge_' + i;
+    const tr = document.createElement('tr');
+    tr.dataset.type = c.type;
+    if (state.challenges.has(id)) tr.classList.add('completed');
+
+    const tdCheck = document.createElement('td');
+    tdCheck.appendChild(mkCheck('challenges', id));
+
+    const tdChallenge = document.createElement('td');
+    tdChallenge.innerHTML = `<div class="challenge-cell">
+      <div class="challenge-name">${c.name}</div>
+      <img class="challenge-img" src="${c.img}" alt="${c.name}" onerror="this.style.background='#1c1c1c'"/>
+    </div>`;
+
+    const tdType = document.createElement('td');
+    tdType.innerHTML = `<span class="type-badge type-${c.type}">${c.type}</span>`;
+
+    const tdDesc = document.createElement('td');
+    tdDesc.className = 'challenge-desc challenge-desc-cell';
+    tdDesc.innerHTML = c.desc.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+
+    const tdXp = document.createElement('td');
+    tdXp.innerHTML = `<span class="xp-badge">${c.xp}</span>`;
+
+    const tdItem = document.createElement('td');
+    if (c.item && c.itemImg) {
+      tdItem.innerHTML = `<div class="reward-item-wrap">
+        <img class="reward-item-img" src="${c.itemImg}" alt="${c.item}" onerror="this.style.display='none'"/>
+        <span class="reward-item-name">${c.item}</span>
+      </div>`;
+    } else {
+      tdItem.innerHTML = '<span style="color:var(--text-dim);font-size:16px;">—</span>';
+    }
+
+    tr.appendChild(tdCheck);
+    tr.appendChild(tdChallenge);
+    tr.appendChild(tdType);
+    tr.appendChild(tdDesc);
+    tr.appendChild(tdXp);
+    tr.appendChild(tdItem);
+    tbody.appendChild(tr);
+  });
+}
+
+// Disguises
+function renderDisguises() {
+  const container = document.getElementById('disguises-container');
+  container.innerHTML = '';
+  DATA.disguises.forEach((d, i) => {
+    const id = 'disguise_' + i;
+    const card = document.createElement('div');
+    card.className = 'disguise-card' + (state.disguises.has(id) ? ' completed' : '');
+
+    const img = document.createElement('img');
+    img.className = 'disguise-img';
+    img.src = d.img;
+    img.alt = d.name;
+    img.onerror = function() { this.style.background='#1c1c1c'; };
+
+    const name = document.createElement('div');
+    name.className = 'disguise-name';
+    name.textContent = d.name;
+
+    const checkEl = mkCheck('disguises', id);
+
+    card.appendChild(img);
+    card.appendChild(name);
+    card.appendChild(checkEl);
+    container.appendChild(card);
+  });
+}
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
+
+function updateProgress() {
+  const sections = [
+    { key: 'stories', total: DATA.stories.length, elId: 'prog-stories' },
+    { key: 'intelligence', total: DATA.intelligence.length, elId: 'prog-intel' },
+    { key: 'challenges', total: DATA.challenges.length, elId: 'prog-challenges' },
+    { key: 'disguises', total: DATA.disguises.length, elId: 'prog-disguises' },
+  ];
+  sections.forEach(s => {
+    const done = state[s.key].size;
+    const el = document.getElementById(s.elId);
+    if (el) el.innerHTML = `<span>${done}</span> / ${s.total}`;
+  });
+}
+
+function updateHomeProgress() {
+  const total = DATA.stories.length + DATA.intelligence.length + DATA.challenges.length + DATA.disguises.length;
+  const done = state.stories.size + state.intelligence.size + state.challenges.size + state.disguises.size;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  const bar = document.getElementById('home-progress-bar');
+  const label = document.getElementById('home-progress-label');
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = pct + '% COMPLETO';
+}
+
+// ─── UI ──────────────────────────────────────────────────────────────────────
+
+function toggleSection(headerEl, bodyId) {
+  const body = document.getElementById(bodyId);
+  const isOpen = body.classList.contains('open');
+  if (isOpen) {
+    body.classList.remove('open');
+    headerEl.classList.remove('open');
+  } else {
+    body.classList.add('open');
+    headerEl.classList.add('open');
+  }
+}
+
+function expandSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  const header = section.querySelector('.section-header');
+  const body = section.querySelector('.section-body');
+  if (!header.classList.contains('open')) {
+    header.classList.add('open');
+    body.classList.add('open');
+  }
+}
+
+function filterChallenges(btn, type) {
+  document.querySelectorAll('#challenge-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChallenges(type);
+  // Re-apply completed states
+  DATA.challenges.forEach((c, i) => {
+    const id = 'challenge_' + i;
+    if (state.challenges.has(id)) {
+      const box = document.querySelector(`[data-category="challenges"][data-id="${id}"]`);
+      if (box) {
+        box.classList.add('checked');
+        const tr = box.closest('tr');
+        if (tr) tr.classList.add('completed');
+      }
+    }
+  });
+}
+
+function openMission(id) {
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('mission').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  document.getElementById('mission').classList.remove('active');
+  document.getElementById('home').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Scroll indicator
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('scrollTop');
+  if (window.scrollY > 300) el.classList.add('visible');
+  else el.classList.remove('visible');
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+loadState();
+renderStories();
+renderIntelligence();
+renderChallenges('');
+renderDisguises();
+updateProgress();
+updateHomeProgress();
+</script>
+</body>
+</html>
