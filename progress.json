@@ -3,8 +3,11 @@
     "story_0",
     "story_1"
   ],
-  "intelligence": [],
+  "intelligence": [
+    "intel_0",
+    "intel_1"
+  ],
   "challenges": [],
   "disguises": [],
-  "updated_at": "2026-06-01T23:50:46.149Z"
+  "updated_at": "2026-06-01T23:50:49.124Z"
 }
