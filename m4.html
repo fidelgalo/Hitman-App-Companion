@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>HITMAN 2 — #4 Chasing a Ghost</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+
+
+:root {
+  --red: #c8102e;
+  --red-glow: rgba(200,16,46,0.4);
+  --red-dim: rgba(200,16,46,0.15);
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --bg: #0e0e0e;
+  --bg2: #141414;
+  --bg3: #1a1a1a;
+  --bg4: #1f1f1f;
+  --border: #252525;
+  --border-light: #333;
+  --text: #f0f0f0;
+  --text-muted: #b8b8b8;
+  --text-dim: #6a6a6a;
+  --blue: #4a9edd;
+  --blue-dim: rgba(74,158,221,0.15);
+  --green: #4ecb7a;
+  --green-dim: rgba(78,203,122,0.12);
+  --purple: #a87fd4;
+  --purple-dim: rgba(168,127,212,0.12);
+  --orange: #e07b3a;
+  --orange-dim: rgba(224,123,58,0.12);
+  --teal: #4ecfb8;
+  --teal-dim: rgba(78,207,184,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
+
+/* ══ PAGES ══ */
+.page{display:none;animation:fadeIn .35s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ HOME ══ */
+#home{min-height:100vh;position:relative}
+.home-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,16,46,.1) 0%,transparent 65%),var(--bg)
+}
+.home-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 100px}
+
+
+/* Mission card */
+.mission-card-home{
+  position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid var(--border);
+  transition:border-color .3s,transform .2s;
+  animation:slideUp .5s .1s cubic-bezier(.16,1,.3,1) both;
+  margin-top:8px
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mission-card-home:hover{border-color:var(--red);transform:translateY(-2px)}
+.mission-card-home:active{transform:scale(.99)}
+.mission-cover-home{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-home:hover .mission-cover-home{transform:scale(1.03)}
+.mission-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.08) 100%)}
+.red-scan{position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(to right,transparent,var(--red),transparent);animation:scan 3.5s 1s infinite}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.prog-ring-wrap{position:absolute;top:12px;right:12px;width:62px;height:62px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.prog-ring-bg{fill:rgba(40,40,40,.65);stroke:rgba(255,255,255,.12);stroke-width:3}
+.prog-ring-fill{fill:none;stroke:var(--red);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:163.4;stroke-dashoffset:163.4;transform:rotate(-90deg);transform-origin:31px 31px;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.prog-ring-pct{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+.mission-info-home{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.mission-title-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-home-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-home{font-size:13px;color:var(--text-muted);letter-spacing:.08em;margin-top:5px}
+
+/* Missions section label */
+.missions-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.45em;color:var(--text-dim);text-transform:uppercase;margin-top:16px;margin-bottom:0;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Missions grid — 2 columns for other missions */
+.missions-grid-other{display:block}
+.mission-card-sm{position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s,transform .2s;display:block;width:100%;margin-top:8px}
+.mission-card-sm:hover{border-color:rgba(200,16,46,.5);transform:translateY(-2px)}
+.mission-card-sm:active{transform:scale(.98)}
+.mission-cover-sm{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-sm:hover .mission-cover-sm{transform:scale(1.04)}
+.mission-overlay-sm{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.15) 60%,transparent 100%)}
+.mission-info-sm{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:8px;flex-shrink:0}
+.mission-title-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-sm{font-size:13px;color:var(--text-muted);letter-spacing:.07em;margin-top:4px}
+.mission-soon-badge{position:absolute;top:14px;right:14px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;background:rgba(0,0,0,.7);border:1px solid var(--border-light);padding:4px 10px;backdrop-filter:blur(6px)}
+
+.home-banner{display:block;width:100%;aspect-ratio:616/353;object-fit:cover;background:var(--bg3);border:1px solid var(--border);margin-bottom:0}
+/* Stats */
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-top:none;background:var(--border);animation:slideUp .5s .2s cubic-bezier(.16,1,.3,1) both;margin-bottom:0}
+.stat-box{background:#222;padding:12px 8px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:3px}
+
+
+/* ══ MISSION PAGE ══ */
+#mission{min-height:100vh;background:var(--bg)}
+
+/* Hero */
+.hero{position:relative;height:56vw;min-height:210px;max-height:360px;overflow:hidden}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 55%,var(--bg) 100%)}
+.hero-top{position:absolute;top:0;left:0;right:0;padding:max(env(safe-area-inset-top),12px) 16px 12px;display:flex;align-items:center}
+.back-btn{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);padding:8px 14px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 16px 18px}
+.hero-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.hero-num{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.hero-loc{font-size:13px;color:var(--text-muted);letter-spacing:.1em;margin-top:6px}
+
+/* Brief */
+.brief-strip{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.brief-text{font-size:13.5px;line-height:1.7;color:var(--text-muted);text-align:justify;text-align-last:left}
+.targets-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.targets-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--text-dim);text-transform:uppercase}
+.chip-pair{display:flex;align-items:center;gap:8px}
+.chip-icon{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.target-chip{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 14px 5px;text-transform:uppercase;background:rgba(200,16,46,.85);border:1px solid rgba(200,16,46,.9);color:#fff;display:flex;flex-direction:column;gap:0}
+.target-chip-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1;margin-bottom:3px}
+.target-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.obj-chip{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 14px 5px;text-transform:uppercase;background:rgba(74,158,221,.75);border:1px solid rgba(74,158,221,.9);color:#fff;display:flex;flex-direction:column;gap:0}
+.obj-chip-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1;margin-bottom:3px}
+.obj-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+
+/* Overall prog */
+.overall-prog{padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.overall-prog-inner{display:flex;align-items:center;justify-content:space-between;padding:9px 0 3px}
+.overall-prog-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase}
+.overall-prog-val{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--red)}
+.prog-track{height:6px;background:rgba(255,255,255,.07);margin-bottom:10px;border-radius:1px}
+.prog-fill{height:100%;background:var(--red);transition:width .8s cubic-bezier(.16,1,.3,1);width:0%;border-radius:1px}
+
+/* Content */
+.mission-content{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* Section */
+.section-block{border-bottom:1px solid var(--border)}
+.section-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;background:#0a0a0a;transition:background .15s}
+.section-header:active{background:#111}
+.sec-header-text{flex:1;min-width:0}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:.12em;color:#fff;text-transform:uppercase;line-height:1}
+.sec-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:1px}
+.sec-prog{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+.sec-prog span{color:var(--red)}
+.sec-chevron{color:var(--text-dim);font-size:11px;flex-shrink:0;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.section-header.open .sec-chevron{transform:rotate(180deg)}
+.sec-prog-track{height:1px;background:rgba(255,255,255,.04)}
+.sec-prog-fill{height:100%;transition:width .6s cubic-bezier(.16,1,.3,1);width:0%}
+.sec-prog-fill-stories{background:var(--red)}
+.sec-prog-fill-intel{background:var(--red)}
+.sec-prog-fill-challenges{background:var(--red)}
+.sec-prog-fill-disguises{background:var(--red)}
+.section-body{display:none}
+.section-body.open{display:block;animation:bodyOpen .25s cubic-bezier(.16,1,.3,1)}
+@keyframes bodyOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STORIES ── */
+.story-item{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s;position:relative;overflow:hidden}
+.story-item.completed{opacity:.38}
+.story-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);transform:scaleY(0);transform-origin:top;transition:transform .2s}
+.story-item:hover::before{transform:scaleY(1)}
+.story-thumb-wrap{position:relative;width:110px;flex-shrink:0}
+.story-thumb{width:110px;height:100%;min-height:90px;object-fit:cover;display:block;background:var(--bg3)}
+.story-check-overlay{position:absolute;top:7px;left:7px;z-index:2}
+.story-body{padding:12px 14px;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.story-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.1}
+.story-subtitle-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--red);text-transform:uppercase;margin-top:3px}
+.story-desc{font-size:11.5px;line-height:1.55;color:#fff;margin-top:6px;text-align:justify;text-align-last:left}
+
+/* ── INTELLIGENCE ── */
+.intel-search-wrap{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.intel-search{flex:1;background:transparent;border:none;outline:none;font-family:'Barlow',sans-serif;font-size:14px;color:var(--text);padding:4px 0}
+.intel-search::placeholder{color:var(--text-dim)}
+.intel-search-icon{color:var(--text-dim);font-size:13px;flex-shrink:0}
+
+.intel-item{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s}
+.intel-item.completed{opacity:.38}
+.intel-check{display:flex;align-items:flex-start;justify-content:center;padding:16px 12px 16px 16px;flex-shrink:0;padding-top:17px}
+.intel-body{padding:13px 16px 13px 0;min-width:0;flex:1}
+.intel-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.15}
+.intel-desc{font-size:12px;line-height:1.6;color:#fff;margin-top:3px;text-align:justify;text-align-last:left}
+
+/* ── CHALLENGES ── */
+.challenge-filters{display:flex;gap:5px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg3)}
+.challenge-filters::-webkit-scrollbar{display:none}
+.cf-btn{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;padding:5px 12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;text-transform:uppercase;transition:all .15s;white-space:nowrap}
+.cf-btn.active,.cf-btn:hover{border-color:var(--red);color:#fff;background:var(--red-dim)}
+
+.challenge-card{border-bottom:1px solid var(--border);background:var(--bg);overflow:hidden}
+.challenge-card.completed .challenge-head{opacity:.35}
+.challenge-card.completed .challenge-body-content{opacity:.35}
+.challenge-head{display:grid;grid-template-columns:56px 1fr auto auto;align-items:center;cursor:pointer;transition:background .15s;min-height:58px}
+.challenge-head:active{background:var(--bg3)}
+.challenge-thumb-wrap{width:56px;height:56px;overflow:hidden;flex-shrink:0;background:var(--bg3)}
+.challenge-thumb{width:56px;height:56px;object-fit:cover;display:block}
+.challenge-head-body{padding:9px 8px 9px 13px;min-width:0}
+.challenge-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase;line-height:1.15;display:flex;align-items:flex-start;gap:6px}
+.challenge-type-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.challenge-xp{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--gold);margin-top:2px}
+.challenge-check-col{padding:8px 8px;display:flex;align-items:center;flex-shrink:0}
+.challenge-expand-col{padding:8px 13px 8px 0;display:flex;align-items:center;flex-shrink:0;color:var(--text-dim);font-size:11px;transition:transform .3s}
+.challenge-card.expanded .challenge-expand-col{transform:rotate(180deg)}
+.challenge-body-content{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.challenge-card.expanded .challenge-body-content{display:block;animation:bodyOpen .2s ease}
+.challenge-desc-text{font-size:13px;line-height:1.65;color:#fff;margin-top:12px;white-space:pre-line;text-align:justify;text-align-last:left}
+.challenge-reward-row{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.reward-img{width:72px;height:72px;object-fit:cover;border:1px solid var(--gold);background:var(--bg3);flex-shrink:0}
+.reward-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.reward-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase}
+
+.dot-A{background:var(--red)}
+.dot-D{background:var(--blue)}
+.dot-F{background:#ffffff}
+.dot-T{background:var(--purple)}
+.dot-TC{background:var(--teal)}
+.dot-CN{background:var(--orange)}
+
+/* ── DISGUISES ── */
+.disguises-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:1px;background:var(--border)}
+.disguise-card{background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;gap:8px;transition:background .15s;position:relative}
+.disguise-card.completed .disguise-img{filter:grayscale(1) brightness(.45)}
+.disguise-card.completed .disguise-name{color:var(--text-dim)}
+.disguise-img-wrap{position:relative;width:86px;height:86px}
+.disguise-img{width:86px;height:86px;object-fit:cover;object-position:top center;display:block;border:1px solid var(--border);background:var(--bg3)}
+.disguise-done-overlay{display:none;position:absolute;inset:0;background:rgba(200,16,46,.35);align-items:center;justify-content:center;font-size:20px}
+.disguise-card.completed .disguise-done-overlay{display:flex}
+.disguise-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase;text-align:center;line-height:1.2}
+.disguise-check-pos{position:absolute;top:7px;right:7px}
+
+/* ── CHECKBOX ── */
+.custom-check{width:20px;height:20px;border:1.5px solid var(--border-light);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.custom-check:hover{border-color:var(--red);background:rgba(200,16,46,.1)}
+.custom-check.checked{border-color:var(--red);background:var(--red)}
+.custom-check.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+/* Checkbox sobre imagem — fundo cinza quando não selecionado */
+.story-check-overlay .custom-check,
+.disguise-check-pos .custom-check{background:rgba(30,30,30,.72);border-color:rgba(180,180,180,.5)}
+.story-check-overlay .custom-check:hover,
+.disguise-check-pos .custom-check:hover{background:rgba(200,16,46,.25);border-color:var(--red)}
+.story-check-overlay .custom-check.checked,
+.disguise-check-pos .custom-check.checked{background:var(--red);border-color:var(--red)}
+
+
+/* ── GITHUB SYNC ── */
+.sync-indicator{position:fixed;bottom:22px;left:18px;display:flex;align-items:center;gap:8px;z-index:200;cursor:pointer}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);transition:background .3s;flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:pulse .8s infinite}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.err{background:var(--red)}
+.sync-dot.off{background:var(--text-dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;transition:color .3s}
+.sync-indicator:hover .sync-lbl{color:var(--text-muted)}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--bg3);border:1px solid var(--border-light);max-width:440px;width:100%;padding:28px;position:relative}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.15em;color:var(--gold-light);text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.modal-sub a{color:var(--blue);text-decoration:none}
+.modal-sub a:hover{text-decoration:underline}
+.modal-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg2);border:1px solid var(--border-light);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.modal-input:focus{border-color:var(--red)}
+.modal-input::placeholder{color:var(--text-dim)}
+.modal-row{display:flex;gap:8px}
+.modal-btn{flex:1;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;transition:background .15s}
+.modal-btn-save{background:var(--red);color:#fff}
+.modal-btn-save:hover{background:#e01535}
+.modal-btn-cancel{background:var(--border-light);color:var(--text-muted)}
+.modal-btn-cancel:hover{background:var(--border)}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-status{font-size:12px;margin-top:12px;min-height:16px;color:var(--text-dim)}
+.modal-status.ok{color:var(--green)}
+.modal-status.err{color:#ff7a8a}
+.modal-divider{height:1px;background:var(--border);margin:18px 0}
+.modal-danger{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--red);text-transform:uppercase;cursor:pointer;background:none;border:none;padding:0}
+.modal-danger:hover{text-decoration:underline}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:22px;right:18px;width:44px;height:44px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;transform:translateY(10px);box-shadow:0 4px 18px rgba(200,16,46,.35)}
+.fab.visible{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:36px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase}
+
+/* ══ RESPONSIVE ══ */
+@media(min-width:480px){
+  .story-item{grid-template-columns:134px 1fr}
+  .story-thumb{width:134px}
+  .challenge-head{grid-template-columns:70px 1fr auto auto}
+  .challenge-thumb-wrap{width:70px;height:70px}
+  .challenge-thumb{width:70px;height:70px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:102px;height:102px}
+}
+@media(min-width:640px){
+  .story-item{grid-template-columns:158px 1fr}
+  .story-thumb{width:158px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:116px;height:116px}
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- ═══ MISSÃO 04: CHASING A GHOST ═══ -->
+<div id="mission-4">
+  <div class="hero">
+    <img class="hero-img" src="4 Chasing a Ghost/4_Chasing_a_Ghost_Cover.png" alt="Chasing a Ghost" onerror="this.style.background='#1a1a1a'"/>
+    <div class="hero-overlay"></div>
+    <div class="hero-top">
+      <a class="back-btn" href="index.html">← Voltar</a>
+    </div>
+    <div class="hero-content">
+      <div class="hero-title-line">
+        <span class="hero-num">#4</span>
+        <span class="hero-title">Chasing a Ghost</span>
+      </div>
+      <div class="hero-loc">Mumbai · Maharashtra, India</div>
+    </div>
+  </div>
+
+  <div class="brief-strip">
+    <div class="targets-row">
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Vanya Shah</span>
+        </div>
+      </div>
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Dawood Rangan</span>
+        </div>
+      </div>
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Wazir Kale</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overall-prog">
+    <div class="overall-prog-inner">
+      <span class="overall-prog-lbl">Progresso Geral</span>
+      <span class="overall-prog-val" id="m4-overall-pct-lbl">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="m4-overall-prog-fill"></div></div>
+  </div>
+
+  <div class="mission-content">
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m4-body-stories')">
+        <div class="sec-header-text"><div class="sec-title">Mission Stories</div></div>
+        <div class="sec-prog" id="m4-prog-stories"><span>0</span> / 11</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-stories" id="m4-pf-stories"></div></div>
+      <div class="section-body open" id="m4-body-stories">
+        <div id="m4-stories-container"></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m4-body-intel')">
+        <div class="sec-header-text"><div class="sec-title">Intelligence</div></div>
+        <div class="sec-prog" id="m4-prog-intel"><span>0</span> / 49</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-intel" id="m4-pf-intel"></div></div>
+      <div class="section-body open" id="m4-body-intel">
+        <div class="intel-search-wrap">
+          <span class="intel-search-icon">🔎</span>
+          <input class="intel-search" type="text" placeholder="Buscar inteligência..." oninput="filterIntelM4(this.value)" autocomplete="off"/>
+        </div>
+        <div id="m4-intel-container"></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m4-body-challenges')">
+        <div class="sec-header-text"><div class="sec-title">Challenges</div></div>
+        <div class="sec-prog" id="m4-prog-challenges"><span>0</span> / 80</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-challenges" id="m4-pf-challenges"></div></div>
+      <div class="section-body open" id="m4-body-challenges">
+        <div class="challenge-filters" id="m4-challenge-filters">
+          <button class="cf-btn active" onclick="filterChallengesM4(this,'')">Todos</button>
+          <button class="cf-btn" onclick="filterChallengesM4(this,'A')">Assassinato</button>
+          <button class="cf-btn" onclick="filterChallengesM4(this,'D')">Descoberta</button>
+          <button class="cf-btn" onclick="filterChallengesM4(this,'F')">Feito</button>
+          <button class="cf-btn" onclick="filterChallengesM4(this,'T')">Target</button>
+          <button class="cf-btn" onclick="filterChallengesM4(this,'TC')">Clássico</button>
+          <button class="cf-btn" onclick="filterChallengesM4(this,'MM')">Mumbai Master</button>
+        </div>
+        <div id="m4-challenges-container"></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m4-body-disguises')">
+        <div class="sec-header-text"><div class="sec-title">Disguises</div></div>
+        <div class="sec-prog" id="m4-prog-disguises"><span>0</span> / 20</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-disguises" id="m4-pf-disguises"></div></div>
+      <div class="section-body open" id="m4-body-disguises">
+        <div class="disguises-grid" id="m4-disguises-container"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ── SECTION TOGGLE ──
+function toggleSec(headerEl, bodyId) {
+  const body = document.getElementById(bodyId);
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  headerEl.classList.toggle('open', !open);
+}
+
+// ── SCROLL FAB ──
+window.addEventListener('scroll', () => {
+  const f = document.getElementById('fab');
+  f.classList.toggle('visible', window.scrollY > 250);
+}, {passive:true});
+
+const DATA_M4 = {
+  stories: [
+  {
+    title: 'Gone With The Wind',
+    subtitle: 'A missing script and an industrial fan.',
+    desc: 'The production of "Mumbai Hero" is coming to a close but it seems there\'s a spot of trouble. Lead actress Karisma Haasan has refused to do a kissing scene with Rangan and has gotten rid of the script by tossing it down an elevator shaft. The scene features the use of a large industrial wind machine. Could be worth investigating.',
+  },
+  {
+    title: 'A Dress To Die For',
+    subtitle: 'A tailor, a Slum Queen and a dress...',
+    desc: 'It appears Vanya Shah is in the market for a dress fit for a queen. She\'s sent after a local tailor but for some reason the man refuses to cooperate. A man of your impeccable tastes should be able to fill in perfectly for the tailor.',
+  },
+  {
+    title: 'Broad Strokes',
+    subtitle: 'A rival assassin.',
+    desc: 'A local hitman known as "The Kashmirian" is in Mumbai on business. He set up a sniper nest in a tower above a stairwell in the local chawl. It appears he\'s targeting the luxury apartment belonging to Dawood Rangan, but he encountered a problem. Perhaps you can assist him?',
+  },
+  {
+    title: 'Picture Perfect',
+    subtitle: 'A missing cast member and a pending photo shoot.',
+    desc: 'Gregory Arthur, a famous broadway star, is apparently late for a photo shoot inside Rangan\'s unfinished tenement tower. Hang on, he uploaded a selfie on social media about half an hour ago. Hm, the Mumbai food district... He\'s likely still there, 47.',
+  },
+  {
+    title: 'A Close Shave',
+    subtitle: 'The Barber and The Maelstrom.',
+    desc: 'This barber is tangled up in some shady business, 47. But even more interesting, he may have seen a picture of The Maelstrom in the hideout of the street gang known as the Crows. That picture would be very helpful to our cause.',
+  },
+  {
+    title: 'A Matter Of Discipline',
+    subtitle: 'An Audience with the Queen.',
+    desc: 'Vanya Shah is eager to meet the new foreman of the Mumbai Laundry business. However, the foreman has taken refuge in his office, unwilling to meet up with her at this time. You might be able to use this to your advantage.',
+  },
+  {
+    title: 'Flames Rekindled',
+    subtitle: 'A house under the gang\'s protection.',
+    desc: 'Armed thugs belonging to the street gang known as "The Crows" have evacuated a hill in the slums of Mumbai. This could be worth investigating.',
+  },
+  {
+    title: 'Our Man in Mumbai',
+    subtitle: 'Another one?',
+    desc: 'The Kashmirian is moving to an apartment in the chawl. It\'s facing the laundry area. I suggest we find out what he\'s up to, 47.',
+  },
+  {
+    title: 'Contract: Dawood Rangan',
+    subtitle: 'To Kill a Peacock...',
+    desc: 'It looks like there\'s a power struggle underway in Mumbai. Vanya Shah has contracted a hired killer, The Kashmirian, to eliminate Dawood Rangan. With Rangan out of the picture, you should be able to pick up that contract and get in touch with Shah through one of the city\'s payphones. Perhaps it will set off a beneficial chain of events?',
+  },
+  {
+    title: 'Contract Vanya Shah',
+    subtitle: 'A contract fit for a queen.',
+    desc: 'Dawood Rangan has contracted a hired killer, The Kashmirian, to eliminate Vanya Shah. Well, with Shah already eliminated, you should get in touch with Rangan through one of the city\'s payphones and let him know the contract is fulfilled. Something is bound to come from it.',
+  },
+  {
+    title: 'Homecoming',
+    subtitle: 'A final meeting?',
+    desc: 'The Kashmirian is on the move again. He looks to be leaving his apartment, possibly the chawl itself. I suggest following him to see where this will end.',
+  },
+],
+  intelligence: [
+  { title: '"Mumbai Hero" Script',           desc: '"Dawood Rangan has made some last minute changes to his script for the film "Mumbai Hero." In the new script, a scene has been added where the character "Mumbai," played by Karisma Haasan, kisses the film\'s hero, played by Rangan himself."' },
+  { title: 'A Close Shave',                  desc: '"A barber is tangled up in some shady business. But even more interesting, he may have seen a picture of The Maelstrom in the hideout of the street gang known as The Crows. That picture would be very helpful to your cause."' },
+  { title: 'A Note to Sagar, the Barber',    desc: '"A recent picture of The Maelstrom, shown to Sagar, the Barber."' },
+  { title: 'A Picture of the Maelstrom',     desc: '"A recent photograph of the Maelstrom. Extremely helpful when trying to identify him in the slums."' },
+  { title: 'A Questionable Test',            desc: '"Maelstrom decides to test how reliable the mapping network for his latest plans is."' },
+  { title: 'Barbershop Key',                 desc: '"A key. Grants access to the barbershop."' },
+  { title: 'Beach House Key',                desc: '"A key. Grants access to The Crows\' outpost by the beach."' },
+  { title: 'Broadway Cuisine',               desc: '"Broadway actor Gregory Arthur has been spotted in the food district of the Mumbai slums, wearing a strange outfit. Arthur is currently in Mumbai shooting Dawood Rangan\'s new film, "Mumbai Hero.""' },
+  { title: 'Colored Smoke',                  desc: '"A couple of members of The Crows are talking about smoke signals. It\'s not entirely clear what the signals do, but it could be useful to investigate further."' },
+  { title: 'Hideout Key',                    desc: '"A key for the fortified doors in the Maelstrom\'s hideout."' },
+  { title: 'Hoist the Flag',                 desc: '"Two members of the Crows are located on the roof of a house in the slums. They\'ve been instructed to raise a flag as a signal of some sort when the resident of the house, Neha, tells them. Supposedly, the flag will summon someone."' },
+  { title: 'Industrial Fan Instructions',    desc: '"According to this manual, the industrial strength fan used in the "Mumbai Hero" kissing scene has two settings. One will provide a nice breeze while the other will simulate a hurricane in strength. The hurricane mode has been disabled and will need to be enabled manually on the fan itself."' },
+  { title: 'Kashmirian\'s Laptop Dongle',   desc: '"A dongle for the Kashmirian\'s laptop, which is probably in the chawl somewhere."' },
+  { title: 'Laundry Business Documents',     desc: '"Documents containing registers and financial records belonging to the previous foreman of the Mumbai Laundry business. Apparently, Shah runs her business through the concept of debt slavery, allowing only those who owe her favors to work there. With these in hand, the new foreman might have a shot at giving a coherent report to Shah."' },
+  { title: 'Lost in the Slums',              desc: '"Principal shooting on Rangan\'s "Mumbai Hero" is coming to an end. Gregory Arthur, the famous broadway star, is apparently due for a photoshoot inside Rangan\'s unfinished tenement tower. He may have gotten lost in the slums."' },
+  { title: 'Luxury Apartment Keycard',       desc: '"A keycard. Opens the luxury apartment."' },
+  { title: 'Maelstrom Manifesto #1',         desc: '"The Maelstrom has distributed a number of audio tapes around Mumbai. In this tape, Maelstrom invites his followers to break with tradition and release themselves from the shackles that bind them in place in society."' },
+  { title: 'Maelstrom Manifesto #2',         desc: '"The Maelstrom has distributed a number of audio tapes around Mumbai. This tape warns that a storm is coming and that Maelstrom and his followers will tear down everything the oppressive elite stands for."' },
+  { title: 'Maelstrom Manifesto #3',         desc: '"The Maelstrom has distributed a number of audio tapes around Mumbai. In this tape, the Maelstrom details what must be done to bring down the establishment. His words encourage rebellion and cruelty and warns that fury and anger will be the end of his enemies."' },
+  { title: 'Maelstrom Manifesto #4',         desc: '"The Maelstrom has distributed a number of audio tapes around Mumbai. In this tape, we hear the story of how Wazir Kale became The Maelstrom. How local mobsters rounded up his gang of youths and threatened them with being burned alive. In the end, Kale embraces his inner darkness and inexplicably sets his old gang on fire himself — possibly to prove that he is much worse than the mobsters."' },
+  { title: 'Maelstrom Manifesto #5',         desc: '"The Maelstrom has distributed a number of audio tapes around Mumbai. This final tape details how Maelstrom took revenge upon the mobster that destroyed his gang and ends with a call to arms. He\'s clearly trying to build an army."' },
+  { title: 'Maelstrom Origins',              desc: '"A legend on the streets of Mumbai states that Maelstrom was once a member, leader even, of the street gang known as "The Crows." He led them for years until local mobsters engaged the gang in a war that ended killing most of the original Crows. Maelstrom himself escaped and left Mumbai for many years. Now, legend has it he\'s back for revenge."' },
+  { title: 'Man from Kashmir',               desc: '"After having successfully completed two hits (eliminating Rangan and Shah), The Kashmirian is on the move again. It looks like he\'s leaving the chawls but where is he going to next?"' },
+  { title: 'Metalworks Shift Schedule',      desc: '"According to a shift schedule in one of the metal workshops, one of the workers is late for his shift."' },
+  { title: 'Missing Script',                 desc: '"The production of "Mumbai Hero" is coming to a close but it seems there\'s a spot of trouble. Lead actress Karisma Haasan has refused to do a kissing scene with Rangan and has gotten rid of the script by tossing it down an elevator shaft. The scene features the use of a large industrial wind machine. Could be worth investigating."' },
+  { title: 'Mumbai Laundry Office Key',      desc: '"A key to the foreman\'s office in the Mumbai Laundry."' },
+  { title: 'Mystery in the Chawls',          desc: '"A room in the chawls looks to be used as the base of operations for someone performing surveillance of some sort."' },
+  { title: 'Neha\'s Letter',                desc: '"A letter addressed to Neha, the female resident on the hill in the slums, reveals that she and Wazir Kale — The Maelstrom — were once romantically involved. Apparently Kale is planning on visiting his old flame in the house they built together before he departed Mumbai for his South China Sea adventures."' },
+  { title: 'Paint By Numbers',               desc: '"A local hitman known as "The Kashmirian" is in Mumbai on business. He has set up a sniper nest in a tower above a stairwell in the local chawl. It appears he\'s targeting the luxury apartment belonging to Dawood Rangan but has encountered a problem. Perhaps you can assist him?"' },
+  { title: 'Picture of Dawood Rangan',       desc: '"A surveillance image of Dawood Rangan in his tower. It looks like he\'s posing in front of a large canvas of some sort. A note on the back says: \'Perfect shot. Painter?\'"' },
+  { title: 'Picture of Vanya Shah',          desc: '"A surveillance image of Vanya Shah on the bridge overlooking the Mumbai Laundry business. A note on the back says: \'Excellent position. Meeting with foreman?\'"' },
+  { title: 'Power Play',                     desc: '"Vanya Shah has put a contract hit on Dawood Rangan. This has to be some sort of power play."' },
+  { title: 'Powerful Fan',                   desc: '"One of the movie set technicians has been forced to hack the control panel of the large fan used on set. The fan was much too powerful for the small set and could blow everything off the roof if used at its highest settings."' },
+  { title: 'Rangan and the Kashmirian',      desc: '"Dawood Rangan has apparently initiated a contract with Karan Dhar, the American-Indian assassin known as The Kashmirian. It is not entirely clear who the target is."' },
+  { title: 'Request to the Tailor',          desc: '"By decree of the generous Vanya Shah, you are hereby called to present to Her a sample of your finest cerulean cloth and to perform a measuring for the most exquisite gown Mumbai has ever seen."' },
+  { title: 'Self-Defence',                   desc: '"Rangan has put out a freelance contract on Vanya Shah in response to her having put one out on him. All is not well in Mumbai."' },
+  { title: 'Slum Queen Bandit Origin',        desc: '"Vanya Shah, the self-proclaimed Queen of the Slums, is apparently of bandit ancestry. The Dacoity were ruthless bandits pillaging the rural areas around Mumbai. Shah apparently learned her violent ways there and honed those skills serving as a pirate in the South China Sea with the legendary Maelstrom."' },
+  { title: 'Stranger in the Chawl',          desc: '"A couple of chawl residents are worried about a stranger living in a rented apartment. He\'s acting strangely and one of the residents believes he even saw a weapon in the stranger\'s room. The building manager refuses to address the concern."' },
+  { title: 'Tea for Two',                    desc: '"It seems that the Maelstrom is using one of the tea servants in the slums as an informant. The servant keeps a close eye on events in the area and frequently reports to the Maelstrom."' },
+  { title: 'The Blindfolded Barber',         desc: '"The Crows have brought a local barber to their hideout to show him a photograph of someone. The Barber was blindfolded, seemingly to make certain he didn\'t recall the way to the hideout. It\'s unclear why he was shown the photograph."' },
+  { title: 'The Chawls',                     desc: '"The Mumbai chawls. Intelligence reports show a few residential complaints about a new tenant in the building. Something related to \'strange behavior\'. It might be worth looking into?"' },
+  { title: 'The Foreman',                    desc: '"Vanya Shah is eager to meet the new foreman of the Mumbai Laundry business. However, the new foreman has taken refuge in his office, unwilling to meet up with her at this time. You might be able to use this to your advantage."' },
+  { title: 'The Hill',                       desc: '"Armed thugs belonging to a street gang known as "The Crows" have evacuated a hill in the slums of Mumbai. This could be worth investigating."' },
+  { title: 'The Kashmirian\'s Room',        desc: '"The Kashmirian is using one of the rooms in the chawl as his base of operations. After having successfully eliminated Dawood Rangan, he\'s moved into another apartment and is now monitoring the Mumbai Laundry business."' },
+  { title: 'The Man in the Tower',           desc: '"There\'s a mysterious man occupying the tower in the Chawls. One of the residents there saw a tripod and some other equipment up there, leading them to believe maybe he\'s a photographer."' },
+  { title: 'The Steam Pond',                 desc: '"Vanya Shah is apparently into meditation. She has gotten a personal steam pond installed in her trainyard and the pond is heated by a gas-powered water heater. Those are known to have serious issues with clogged pressure locks. Maybe an inspection of the setup is in order?"' },
+  { title: 'Tube of Paint',                  desc: '"A tube of art paint that looks to have been misplaced among some wall painting equipment. This type of paint is used for canvas painting."' },
+  { title: 'Two for One',                    desc: '"The hitman known as "The Kashmirian" is in Mumbai on an interesting mission. Initially hired by Vanya Shah, The Kashmirian arrived in Mumbai to eliminate Dawood Rangan. However, he decided to double down on his contract. He contacted Rangan and made him an offer — double the money and he would eliminate Shah instead. However, The Kashmirian appears to have decided to fulfill both contracts. What his ulterior motive is, however, is unclear."' },
+  { title: 'Vanya Shah\'s Request',         desc: '"Vanya Shah has demanded that a local tailor make her a gown, but the tailor is reluctant."' },
+],
+  challenges: [
+  // ── ASSASSINATION (24) ──
+  { name: 'Waiting for a Sign',              type: 'A',  desc: 'Take out the Maelstrom with a neon sign.',                                                                                                                                xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'In Cahoots',                      type: 'A',  desc: 'Eliminate both Vanya Shah and Dawood Rangan using maritime trickery.',                                                                                                     xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Barbershop Duette',               type: 'A',  desc: 'Disguise yourself as the Barber and give the Maelstrom a nice clean shave...\nMake sure you eliminate him.',                                                               xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'What\'s Your Flava?',            type: 'A',  desc: 'Poison the Maelstrom with his favorite tea.',                                                                                                                               xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Tea Time',                        type: 'A',  desc: 'Poison Vanya Shah disguised as a Servant.',                                                                                                                                xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Me Time',                         type: 'A',  desc: 'Eliminate Vanya Shah by tampering with her private pool.',                                                                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mumbai Blackout',                 type: 'A',  desc: 'Eliminate all targets using electricity.',                                                                                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'It was His Biggest Fan',          type: 'A',  desc: 'Tamper with the photo shoot stage and send Dawood Rangan flying.',                                                                                                         xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Proxy Killer',                    type: 'A',  desc: 'Help the Kashmirian take out both Vanya Shah and Dawood Rangan.',                                                                                                          xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mumbai Electric',                 type: 'A',  desc: 'Kill a target using electricity.',                                                                                                                                         xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Free Bird',                       type: 'A',  desc: 'Drop a birdcage on Vanya Shah.',                                                                                                                                           xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Stand Still',                     type: 'A',  desc: 'Eliminate Vanya Shah, disguised as the Tailor, while taking her measurements.',                                                                                            xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Everybody on Board',              type: 'A',  desc: 'Derail the train so it makes an unexpected stop.\nMake sure that Vanya Shah and the Maelstrom are ready.',                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Within a Broader Scope',          type: 'A',  desc: 'Shoot and eliminate all targets with a sniper rifle from the outlook post near the beach.',                                                                                xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Suspension is Murder',        type: 'A',  desc: 'Pull some strings and arrange a meeting between Dawood Rangan and the Maelstrom.\nThen pull a much larger and heavier string and let go...',                               xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Within Scope',                    type: 'A',  desc: 'Shoot and eliminate any target with a sniper rifle from the outlook post near the beach.',                                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Bird of Prey',                    type: 'MM', desc: 'Eliminate a target with a beak staff while disguised as the Holy Man.',                                                                                                    xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Hold My Hair',                    type: 'A',  desc: 'Assassinate a target by drowning them in Mumbai.',                                                                                                                         xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Piano Man',                       type: 'A',  desc: 'Assassinate a target with the fiber wire in Mumbai.',                                                                                                                      xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Straight Shot',                   type: 'A',  desc: 'Assassinate a target with a headshot in Mumbai.',                                                                                                                          xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Taste of Your Own Cure',          type: 'MM', desc: 'Eliminate the Kashmirian with a sniper rifle from the Studio in Dawood Rangan\'s apartment while disguised as the Holy Man.',                                              xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Versatile Assassin',              type: 'A',  desc: 'Complete all the following Versatile challenges in Mumbai:\nPiano Man\nSomeone Could Hurt Themselves\nHold My Hair\nStraight Shot\nTasteless, Traceless',                  xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Tasteless, Traceless',            type: 'A',  desc: 'Assassinate a target with lethal poison in Mumbai.',                                                                                                                       xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Someone Could Hurt Themselves',   type: 'A',  desc: 'Assassinate a target in an accident in Mumbai.',                                                                                                                           xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  // ── DISCOVERY (15) ──
+  { name: 'A Secret Grudge',                 type: 'D',  desc: 'Find and read Vanya Shah\'s diary.',                                                                                                                                       xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Make it Work',                    type: 'D',  desc: 'Acquire the correct cloth sample for Vanya Shah\'s dress.',                                                                                                                xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become the Foreman',              type: 'D',  desc: 'Disguise yourself as the Mumbai Laundry Foreman.',                                                                                                                         xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Let\'s Get the Tuk Out of Here', type: 'D',  desc: 'Leave Mumbai using a local taxi.',                                                                                                                                          xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Chameleon',                       type: 'D',  desc: 'Find and equip all disguises in Mumbai.',                                                                                                                                  xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become the Painter',              type: 'D',  desc: 'Disguise yourself as Dawood Rangan\'s Portrait Painter.',                                                                                                                  xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Red Flag',                        type: 'D',  desc: 'Raise the flag from a distance.',                                                                                                                                          xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become the Tailor',               type: 'D',  desc: 'Disguise yourself as the Local Tailor from the outskirts of the slums.',                                                                                                   xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become the Holy Man',             type: 'D',  desc: 'Disguise yourself as the Holy Man.',                                                                                                                                       xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become the Kashmirian',           type: 'D',  desc: 'Disguise yourself as the Kashmirian.',                                                                                                                                     xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Out of the Nest',                 type: 'D',  desc: 'Escape Mumbai using the exit in the hideout.',                                                                                                                             xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become a Metal Worker',           type: 'D',  desc: 'Disguise yourself as a Metal Worker from the slums.',                                                                                                                      xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become a Denim Angel',            type: 'D',  desc: 'Disguise yourself as one of the Actors from Dawood Rangan\'s movie shoot.',                                                                                                xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Become the Barber',               type: 'D',  desc: 'Disguise yourself as the Local Barber from the slums.',                                                                                                                    xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Discover Mumbai',                 type: 'D',  desc: 'Reveal all undiscovered areas in Mumbai.',                                                                                                                                 xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  // ── FEATS (33) ──
+  { name: 'Mission Story - Flames Rekindled', type: 'F',  desc: 'A house under the gang\'s protection.',                                                                                                                                  xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Artists at Work',                 type: 'F',  desc: 'Help the Kashmirian get a clear line of fire to Dawood Rangan.',                                                                                                          xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mission Story - A Dress To Die For', type: 'F', desc: 'Infiltrate Vanya Shah\'s personal quarters as a Local Tailor.',                                                                                                         xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Hoist the Flag',                  type: 'F',  desc: 'Raise the flag on one of the rooftops on the hill.',                                                                                                                      xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mission Story - Gone With the Wind', type: 'F', desc: 'A missing script and an industrial fan.',                                                                                                                               xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Hard Hat',                        type: 'F',  desc: 'Knock out someone in the Rangan Tower construction site with a brick.',                                                                                                    xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'A Dark Scheme',                   type: 'F',  desc: 'Investigate Dawood Rangan\'s private laptop.',                                                                                                                             xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'No, You Hang Up',                 type: 'F',  desc: 'Complete the Kashmirian\'s contract on Vanya Shah.\nThen call Dawood Rangan.',                                                                                             xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Helping Hand',                type: 'F',  desc: 'Complete "The Foreman", "The Artist" and "The Kashmirian".',                                                                                                               xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Show\'s Over',                   type: 'F',  desc: 'Knock out the guard watching TV on the top floor in Rangan Tower.',                                                                                                        xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Memoirs',                         type: 'F',  desc: 'Find all the tapes recorded by the Maelstrom.',                                                                                                                            xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Call Her Maybe',                  type: 'F',  desc: 'Complete the Kashmirian\'s contract on Dawood Rangan.\nThen call Vanya Shah.',                                                                                             xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Artist',                      type: 'F',  desc: 'Make the artist finish his painting of Dawood Rangan.',                                                                                                                    xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'A Mumbai Overcoat',               type: 'F',  desc: 'Drop Dawood Rangan into wet concrete.',                                                                                                                                    xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Boyz n Dawood',                   type: 'F',  desc: 'Eliminate four of Dawood\'s bodyguards.',                                                                                                                                  xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Cool Club',                   type: 'F',  desc: 'Attend a meeting with the Maelstrom disguised as the Kashmirian.',                                                                                                         xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Kashmirian',                  type: 'F',  desc: 'Make the Kashmirian meet with the Maelstrom.',                                                                                                                             xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Live to Mole Another Day',         type: 'F',  desc: 'Save the mole captured by Dawood Rangan.',                                                                                                                               xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mission Story - Broad Strokes',   type: 'F',  desc: 'Help out a local assassin and infiltrate Dawood Rangan\'s penthouse as his Personal Portrait Painter.',                                                                   xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Drop the Mike',                   type: 'F',  desc: 'Interrupt Dawood Rangan as he interrogates the mole.',                                                                                                                     xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Teamwork',                        type: 'F',  desc: 'Help the Kashmirian get a clear line of fire to Vanya Shah.',                                                                                                              xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Fan Manual',                  type: 'F',  desc: 'Find the industrial fan manual in Rangan Tower.',                                                                                                                          xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Not in the Script',               type: 'F',  desc: 'Find the missing manuscript in Rangan Tower.',                                                                                                                             xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mission Story - A Matter of Discipline', type: 'F', desc: 'Attend the meeting on the bridge as the Laundry Foreman.',                                                                                                          xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mission Story - Picture Perfect', type: 'F',  desc: 'Get close to Dawood Rangan and infiltrate a photo shoot as the Lead Actor.',                                                                                               xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Steamin\'',                      type: 'F',  desc: 'Locate the hot water tank on the roof of the train yard building.',                                                                                                        xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Man and the Legend',           type: 'F',  desc: 'Identify the Maelstrom.',                                                                                                                                                 xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Mission Story - A Close Shave',   type: 'F',  desc: 'Open the barbershop in the Mumbai slums.',                                                                                                                                xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Smashing, Baby!',                 type: 'F',  desc: 'Start the photoshoot as the Lead Actor.',                                                                                                                                  xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Foreman',                     type: 'F',  desc: 'Make the Foreman attend the meeting with Vanya Shah on the bridge.',                                                                                                       xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Privacy, Please',                 type: 'F',  desc: 'Shoot and destroy 5 surveillance cameras in Mumbai.',                                                                                                                      xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Ex-Pirate, Spa-Ghet-It?',         type: 'TCT', desc: 'Knock out a target with a can of expired spaghetti.',                                                                                                                    xp: '+1000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Big Spender',                     type: 'F',  desc: 'Buy all three cloth samples from a Vendor in the slums.',                                                                                                                  xp: '+2000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  // ── TARGETS (3) ──
+  { name: 'The Ghost',                       type: 'T',  desc: 'Eliminate the Maelstrom.',                                                                                                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Queen',                       type: 'T',  desc: 'Eliminate Vanya Shah.',                                                                                                                                                    xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Showman',                     type: 'T',  desc: 'Eliminate Dawood Rangan.',                                                                                                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  // ── THE CLASSICS (5) ──
+  { name: 'Sniper Assassin',                 type: 'TC', desc: 'Complete "Chasing a Ghost".\nAssassinate your targets with a sniper rifle.\nOnly eliminate the targets.\nDo not get spotted.\nIf you\'re detected by cameras, erase or destroy the evidence.',                                   xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Silent Assassin',                 type: 'TC', desc: 'Complete "Chasing a Ghost".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.',                                                                 xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'The Classics',                   type: 'TC', desc: 'Complete all the Classic challenges on "Chasing a Ghost":\nSilent Assassin\nSilent Assassin, Suit Only\nSniper Assassin\nSuit Only',                                                                                              xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Silent Assassin, Suit Only',      type: 'TC', desc: 'Complete "Chasing a Ghost".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.\nDo it all in your suit.',                                        xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+  { name: 'Suit Only',                       type: 'TC', desc: 'Assassinate the targets and complete the mission.\nDo it all in your suit.',                                                                                                xp: '+4000XP', item: null, itemImg: null, img: '4 Chasing a Ghost/Challenges/' },
+],
+  disguises: [
+  { name: 'Imperial Classic (Starting suit)', img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Barber',                           img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Bollywood Bodyguard',              img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Bollywood Crew',                   img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Dancer',                           img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Elite Thug',                       img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Food Vendor',                      img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Holy Man',                         img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Kashmirian',                       img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Laundry Foreman',                  img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Laundry Worker',                   img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Lead Actor',                       img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Local Security',                   img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Metal Worker',                     img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Painter',                          img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Queen\'s Bodyguard',              img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Queen\'s Guard',                  img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Tailor',                           img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Thug',                             img: '4 Chasing a Ghost/Disguises/' },
+  { name: 'Vanya\'s Servant',               img: '4 Chasing a Ghost/Disguises/' },
+]
+};
+
+const stateM4 = { stories:new Set(), intelligence:new Set(), challenges:new Set(), disguises:new Set() };
+
+function saveStateM4() {
+  localStorage.setItem('hitman_m4_v1', JSON.stringify({
+    stories:[...stateM4.stories], intelligence:[...stateM4.intelligence],
+    challenges:[...stateM4.challenges], disguises:[...stateM4.disguises]
+  }));
+}
+function loadStateM4() {
+  try {
+    const s = JSON.parse(localStorage.getItem('hitman_m4_v1')||'{}');
+    stateM4.stories      = new Set(s.stories||[]);
+    stateM4.intelligence = new Set(s.intelligence||[]);
+    stateM4.challenges   = new Set(s.challenges||[]);
+    stateM4.disguises    = new Set(s.disguises||[]);
+  } catch(e){}
+}
+
+function mkCheckM4(cat, id) {
+  const el = document.createElement('div');
+  el.className = 'custom-check' + (stateM4[cat].has(id) ? ' checked' : '');
+  el.onclick = function(e) {
+    e.stopPropagation();
+    if (stateM4[cat].has(id)) { stateM4[cat].delete(id); el.classList.remove('checked'); }
+    else { stateM4[cat].add(id); el.classList.add('checked'); }
+    saveStateM4(); updateProgressM4();
+    const row = el.closest('.story-item,.intel-item,.challenge-card,.disguise-card');
+    if (row) row.classList.toggle('completed', stateM4[cat].has(id));
+  };
+  return el;
+}
+
+function updateProgressM4() {
+  const cats = [
+    ['stories',      'm4-prog-stories',    'm4-pf-stories'],
+    ['intelligence', 'm4-prog-intel',      'm4-pf-intel'],
+    ['challenges',   'm4-prog-challenges', 'm4-pf-challenges'],
+    ['disguises',    'm4-prog-disguises',  'm4-pf-disguises'],
+  ];
+  cats.forEach(([cat, progId, pfId]) => {
+    const total = DATA_M4[cat].length;
+    const done  = stateM4[cat].size;
+    const prog  = document.getElementById(progId);
+    const pf    = document.getElementById(pfId);
+    if (prog) prog.innerHTML = `<span>${done}</span> / ${total}`;
+    if (pf)   pf.style.width = total ? (done/total*100)+'%' : '0%';
+  });
+  const allTotal = cats.reduce((s,[cat]) => s + DATA_M4[cat].length, 0);
+  const allDone  = cats.reduce((s,[cat]) => s + stateM4[cat].size, 0);
+  const pct = allTotal > 0 ? Math.round(allDone/allTotal*100) : 0;
+  const opf = document.getElementById('m4-overall-prog-fill');
+  const opl = document.getElementById('m4-overall-pct-lbl');
+  if (opf) opf.style.width = pct + '%';
+  if (opl) opl.textContent = pct + '%';
+}
+
+function renderStoriesM4() {
+  const c = document.getElementById('m4-stories-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M4.stories.forEach((s,i) => {
+    const id = 'm4_story_'+i;
+    const el = document.createElement('div');
+    el.className = 'story-item' + (stateM4.stories.has(id) ? ' completed' : '');
+    const tw = document.createElement('div'); tw.className = 'story-thumb-wrap';
+    const img = document.createElement('img'); img.className = 'story-thumb';
+    img.src = s.img; img.alt = s.title; img.onerror = function(){ this.style.background='#1a1a1a'; };
+    const co = document.createElement('div'); co.className = 'story-check-overlay';
+    co.appendChild(mkCheckM4('stories', id));
+    tw.appendChild(img); tw.appendChild(co);
+    const body = document.createElement('div'); body.className = 'story-body';
+    body.innerHTML = `<div class="story-title">${s.title}</div>
+      <div class="story-subtitle-tag">${s.subtitle}</div>
+      <div class="story-desc">${s.desc}</div>`;
+    el.appendChild(tw); el.appendChild(body); c.appendChild(el);
+  });
+}
+
+function renderIntelM4(filter='') {
+  const c = document.getElementById('m4-intel-container'); if(!c) return;
+  c.innerHTML = '';
+  const lf = filter.toLowerCase();
+  DATA_M4.intelligence.forEach((item,i) => {
+    if (lf && !item.title.toLowerCase().includes(lf) && !item.desc.toLowerCase().includes(lf)) return;
+    const id = 'm4_intel_'+i;
+    const el = document.createElement('div');
+    el.className = 'intel-item' + (stateM4.intelligence.has(id) ? ' completed' : '');
+    const cw = document.createElement('div'); cw.className = 'intel-check';
+    cw.appendChild(mkCheckM4('intelligence', id));
+    const body = document.createElement('div'); body.className = 'intel-body';
+    body.innerHTML = `<div class="intel-title">${item.title}</div><div class="intel-desc">${item.desc}</div>`;
+    el.appendChild(cw); el.appendChild(body); c.appendChild(el);
+  });
+  if (!c.children.length) c.innerHTML = '<div class="empty-state">Nenhum resultado encontrado</div>';
+}
+function filterIntelM4(v) { renderIntelM4(v); }
+
+function renderChallengesM4(typeFilter) {
+  const c = document.getElementById('m4-challenges-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M4.challenges.forEach((ch,i) => {
+    if (typeFilter && ch.type !== typeFilter) return;
+    const id = 'm4_challenge_'+i;
+    const card = document.createElement('div');
+    card.className = 'challenge-card' + (stateM4.challenges.has(id) ? ' completed' : '');
+    const head = document.createElement('div'); head.className = 'challenge-head';
+    head.onclick = function(){ card.classList.toggle('expanded'); };
+    const tw = document.createElement('div'); tw.className = 'challenge-thumb-wrap';
+    const thumb = document.createElement('img'); thumb.className = 'challenge-thumb';
+    thumb.src = ch.img; thumb.alt = ch.name; thumb.onerror = function(){ this.style.background='#1a1a1a'; };
+    tw.appendChild(thumb);
+    const hb = document.createElement('div'); hb.className = 'challenge-head-body';
+    hb.innerHTML = `<div class="challenge-name"><span class="challenge-type-dot dot-${ch.type}"></span>${ch.name}</div>
+      <div class="challenge-xp">${ch.xp}</div>`;
+    const cc = document.createElement('div'); cc.className = 'challenge-check-col';
+    cc.appendChild(mkCheckM4('challenges', id));
+    const ec = document.createElement('div'); ec.className = 'challenge-expand-col'; ec.innerHTML = '▼';
+    head.appendChild(tw); head.appendChild(hb); head.appendChild(cc); head.appendChild(ec);
+    const body = document.createElement('div'); body.className = 'challenge-body-content';
+    const lines = ch.desc.split('\n');
+    const rest = lines.slice(1);
+    const descHtml = rest.length
+      ? `<ul style="margin:6px 0 0 16px;padding:0">${rest.map(l=>`<li>${l}</li>`).join('')}</ul>`
+      : '';
+    body.innerHTML = `<div class="challenge-desc-text">${lines[0]}${descHtml}</div>`;
+    card.appendChild(head); card.appendChild(body); c.appendChild(card);
+  });
+}
+function filterChallengesM4(btn, type) {
+  document.querySelectorAll('#m4-body-challenges .cf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChallengesM4(type);
+}
+
+function renderDisguisesM4() {
+  const c = document.getElementById('m4-disguises-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M4.disguises.forEach((d,i) => {
+    const id = 'm4_disguise_'+i;
+    const card = document.createElement('div');
+    card.className = 'disguise-card' + (stateM4.disguises.has(id) ? ' completed' : '');
+    card.onclick = function(e) {
+      if (e.target.closest('.disguise-check-pos')) return;
+      const chkEl = card.querySelector('.custom-check');
+      if (!chkEl) return;
+      if (stateM4['disguises'].has(id)) { stateM4['disguises'].delete(id); chkEl.classList.remove('checked'); }
+      else { stateM4['disguises'].add(id); chkEl.classList.add('checked'); }
+      saveStateM4();
+      card.classList.toggle('completed', stateM4['disguises'].has(id));
+      updateProgressM4();
+    };
+    const wrap = document.createElement('div'); wrap.className = 'disguise-img-wrap';
+    const img = document.createElement('img'); img.className = 'disguise-img';
+    img.src = d.img; img.alt = d.name; img.onerror = function(){ this.style.background='#1a1a1a'; };
+    const done = document.createElement('div'); done.className = 'disguise-done-overlay'; done.textContent = '✓';
+    const chkPos = document.createElement('div'); chkPos.className = 'disguise-check-pos';
+    chkPos.appendChild(mkCheckM4('disguises', id));
+    wrap.appendChild(img); wrap.appendChild(done);
+    const name = document.createElement('div'); name.className = 'disguise-name'; name.textContent = d.name;
+    card.appendChild(wrap); card.appendChild(name); card.appendChild(chkPos);
+    c.appendChild(card);
+  });
+}
+
+// ── INIT M4 ──
+loadStateM4();
+renderStoriesM4();
+renderIntelM4();
+renderChallengesM4('');
+renderDisguisesM4();
+updateProgressM4();
+</script>
+
+</body>
+</html>

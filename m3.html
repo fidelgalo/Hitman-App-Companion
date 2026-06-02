@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>HITMAN 2 — #3 Three-Headed Serpent</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+
+
+:root {
+  --red: #c8102e;
+  --red-glow: rgba(200,16,46,0.4);
+  --red-dim: rgba(200,16,46,0.15);
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --bg: #0e0e0e;
+  --bg2: #141414;
+  --bg3: #1a1a1a;
+  --bg4: #1f1f1f;
+  --border: #252525;
+  --border-light: #333;
+  --text: #f0f0f0;
+  --text-muted: #b8b8b8;
+  --text-dim: #6a6a6a;
+  --blue: #4a9edd;
+  --blue-dim: rgba(74,158,221,0.15);
+  --green: #4ecb7a;
+  --green-dim: rgba(78,203,122,0.12);
+  --purple: #a87fd4;
+  --purple-dim: rgba(168,127,212,0.12);
+  --orange: #e07b3a;
+  --orange-dim: rgba(224,123,58,0.12);
+  --teal: #4ecfb8;
+  --teal-dim: rgba(78,207,184,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
+
+/* ══ PAGES ══ */
+.page{display:none;animation:fadeIn .35s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ HOME ══ */
+#home{min-height:100vh;position:relative}
+.home-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,16,46,.1) 0%,transparent 65%),var(--bg)
+}
+.home-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 100px}
+
+
+/* Mission card */
+.mission-card-home{
+  position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid var(--border);
+  transition:border-color .3s,transform .2s;
+  animation:slideUp .5s .1s cubic-bezier(.16,1,.3,1) both;
+  margin-top:8px
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mission-card-home:hover{border-color:var(--red);transform:translateY(-2px)}
+.mission-card-home:active{transform:scale(.99)}
+.mission-cover-home{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-home:hover .mission-cover-home{transform:scale(1.03)}
+.mission-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.08) 100%)}
+.red-scan{position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(to right,transparent,var(--red),transparent);animation:scan 3.5s 1s infinite}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.prog-ring-wrap{position:absolute;top:12px;right:12px;width:62px;height:62px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.prog-ring-bg{fill:rgba(40,40,40,.65);stroke:rgba(255,255,255,.12);stroke-width:3}
+.prog-ring-fill{fill:none;stroke:var(--red);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:163.4;stroke-dashoffset:163.4;transform:rotate(-90deg);transform-origin:31px 31px;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.prog-ring-pct{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+.mission-info-home{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.mission-title-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-home-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-home{font-size:13px;color:var(--text-muted);letter-spacing:.08em;margin-top:5px}
+
+/* Missions section label */
+.missions-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.45em;color:var(--text-dim);text-transform:uppercase;margin-top:16px;margin-bottom:0;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Missions grid — 2 columns for other missions */
+.missions-grid-other{display:block}
+.mission-card-sm{position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s,transform .2s;display:block;width:100%;margin-top:8px}
+.mission-card-sm:hover{border-color:rgba(200,16,46,.5);transform:translateY(-2px)}
+.mission-card-sm:active{transform:scale(.98)}
+.mission-cover-sm{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-sm:hover .mission-cover-sm{transform:scale(1.04)}
+.mission-overlay-sm{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.15) 60%,transparent 100%)}
+.mission-info-sm{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:8px;flex-shrink:0}
+.mission-title-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-sm{font-size:13px;color:var(--text-muted);letter-spacing:.07em;margin-top:4px}
+.mission-soon-badge{position:absolute;top:14px;right:14px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;background:rgba(0,0,0,.7);border:1px solid var(--border-light);padding:4px 10px;backdrop-filter:blur(6px)}
+
+.home-banner{display:block;width:100%;aspect-ratio:616/353;object-fit:cover;background:var(--bg3);border:1px solid var(--border);margin-bottom:0}
+/* Stats */
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-top:none;background:var(--border);animation:slideUp .5s .2s cubic-bezier(.16,1,.3,1) both;margin-bottom:0}
+.stat-box{background:#222;padding:12px 8px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:3px}
+
+
+/* ══ MISSION PAGE ══ */
+#mission{min-height:100vh;background:var(--bg)}
+
+/* Hero */
+.hero{position:relative;height:56vw;min-height:210px;max-height:360px;overflow:hidden}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 55%,var(--bg) 100%)}
+.hero-top{position:absolute;top:0;left:0;right:0;padding:max(env(safe-area-inset-top),12px) 16px 12px;display:flex;align-items:center}
+.back-btn{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);padding:8px 14px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 16px 18px}
+.hero-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.hero-num{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.hero-loc{font-size:13px;color:var(--text-muted);letter-spacing:.1em;margin-top:6px}
+
+/* Brief */
+.brief-strip{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.brief-text{font-size:13.5px;line-height:1.7;color:var(--text-muted);text-align:justify;text-align-last:left}
+.targets-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.targets-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--text-dim);text-transform:uppercase}
+.chip-pair{display:flex;align-items:center;gap:8px}
+.chip-icon{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.target-chip{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 14px 5px;text-transform:uppercase;background:rgba(200,16,46,.85);border:1px solid rgba(200,16,46,.9);color:#fff;display:flex;flex-direction:column;gap:0}
+.target-chip-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1;margin-bottom:3px}
+.target-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.obj-chip{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 14px 5px;text-transform:uppercase;background:rgba(74,158,221,.75);border:1px solid rgba(74,158,221,.9);color:#fff;display:flex;flex-direction:column;gap:0}
+.obj-chip-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1;margin-bottom:3px}
+.obj-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+
+/* Overall prog */
+.overall-prog{padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.overall-prog-inner{display:flex;align-items:center;justify-content:space-between;padding:9px 0 3px}
+.overall-prog-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase}
+.overall-prog-val{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--red)}
+.prog-track{height:6px;background:rgba(255,255,255,.07);margin-bottom:10px;border-radius:1px}
+.prog-fill{height:100%;background:var(--red);transition:width .8s cubic-bezier(.16,1,.3,1);width:0%;border-radius:1px}
+
+/* Content */
+.mission-content{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* Section */
+.section-block{border-bottom:1px solid var(--border)}
+.section-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;background:#0a0a0a;transition:background .15s}
+.section-header:active{background:#111}
+.sec-header-text{flex:1;min-width:0}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:.12em;color:#fff;text-transform:uppercase;line-height:1}
+.sec-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:1px}
+.sec-prog{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+.sec-prog span{color:var(--red)}
+.sec-chevron{color:var(--text-dim);font-size:11px;flex-shrink:0;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.section-header.open .sec-chevron{transform:rotate(180deg)}
+.sec-prog-track{height:1px;background:rgba(255,255,255,.04)}
+.sec-prog-fill{height:100%;transition:width .6s cubic-bezier(.16,1,.3,1);width:0%}
+.sec-prog-fill-stories{background:var(--red)}
+.sec-prog-fill-intel{background:var(--red)}
+.sec-prog-fill-challenges{background:var(--red)}
+.sec-prog-fill-disguises{background:var(--red)}
+.section-body{display:none}
+.section-body.open{display:block;animation:bodyOpen .25s cubic-bezier(.16,1,.3,1)}
+@keyframes bodyOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STORIES ── */
+.story-item{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s;position:relative;overflow:hidden}
+.story-item.completed{opacity:.38}
+.story-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);transform:scaleY(0);transform-origin:top;transition:transform .2s}
+.story-item:hover::before{transform:scaleY(1)}
+.story-thumb-wrap{position:relative;width:110px;flex-shrink:0}
+.story-thumb{width:110px;height:100%;min-height:90px;object-fit:cover;display:block;background:var(--bg3)}
+.story-check-overlay{position:absolute;top:7px;left:7px;z-index:2}
+.story-body{padding:12px 14px;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.story-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.1}
+.story-subtitle-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--red);text-transform:uppercase;margin-top:3px}
+.story-desc{font-size:11.5px;line-height:1.55;color:#fff;margin-top:6px;text-align:justify;text-align-last:left}
+
+/* ── INTELLIGENCE ── */
+.intel-search-wrap{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.intel-search{flex:1;background:transparent;border:none;outline:none;font-family:'Barlow',sans-serif;font-size:14px;color:var(--text);padding:4px 0}
+.intel-search::placeholder{color:var(--text-dim)}
+.intel-search-icon{color:var(--text-dim);font-size:13px;flex-shrink:0}
+
+.intel-item{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s}
+.intel-item.completed{opacity:.38}
+.intel-check{display:flex;align-items:flex-start;justify-content:center;padding:16px 12px 16px 16px;flex-shrink:0;padding-top:17px}
+.intel-body{padding:13px 16px 13px 0;min-width:0;flex:1}
+.intel-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.15}
+.intel-desc{font-size:12px;line-height:1.6;color:#fff;margin-top:3px;text-align:justify;text-align-last:left}
+
+/* ── CHALLENGES ── */
+.challenge-filters{display:flex;gap:5px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg3)}
+.challenge-filters::-webkit-scrollbar{display:none}
+.cf-btn{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;padding:5px 12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;text-transform:uppercase;transition:all .15s;white-space:nowrap}
+.cf-btn.active,.cf-btn:hover{border-color:var(--red);color:#fff;background:var(--red-dim)}
+
+.challenge-card{border-bottom:1px solid var(--border);background:var(--bg);overflow:hidden}
+.challenge-card.completed .challenge-head{opacity:.35}
+.challenge-card.completed .challenge-body-content{opacity:.35}
+.challenge-head{display:grid;grid-template-columns:56px 1fr auto auto;align-items:center;cursor:pointer;transition:background .15s;min-height:58px}
+.challenge-head:active{background:var(--bg3)}
+.challenge-thumb-wrap{width:56px;height:56px;overflow:hidden;flex-shrink:0;background:var(--bg3)}
+.challenge-thumb{width:56px;height:56px;object-fit:cover;display:block}
+.challenge-head-body{padding:9px 8px 9px 13px;min-width:0}
+.challenge-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase;line-height:1.15;display:flex;align-items:flex-start;gap:6px}
+.challenge-type-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.challenge-xp{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--gold);margin-top:2px}
+.challenge-check-col{padding:8px 8px;display:flex;align-items:center;flex-shrink:0}
+.challenge-expand-col{padding:8px 13px 8px 0;display:flex;align-items:center;flex-shrink:0;color:var(--text-dim);font-size:11px;transition:transform .3s}
+.challenge-card.expanded .challenge-expand-col{transform:rotate(180deg)}
+.challenge-body-content{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.challenge-card.expanded .challenge-body-content{display:block;animation:bodyOpen .2s ease}
+.challenge-desc-text{font-size:13px;line-height:1.65;color:#fff;margin-top:12px;white-space:pre-line;text-align:justify;text-align-last:left}
+.challenge-reward-row{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.reward-img{width:72px;height:72px;object-fit:cover;border:1px solid var(--gold);background:var(--bg3);flex-shrink:0}
+.reward-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.reward-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase}
+
+.dot-A{background:var(--red)}
+.dot-D{background:var(--blue)}
+.dot-F{background:#ffffff}
+.dot-T{background:var(--purple)}
+.dot-TC{background:var(--teal)}
+.dot-CN{background:var(--orange)}
+
+/* ── DISGUISES ── */
+.disguises-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:1px;background:var(--border)}
+.disguise-card{background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;gap:8px;transition:background .15s;position:relative}
+.disguise-card.completed .disguise-img{filter:grayscale(1) brightness(.45)}
+.disguise-card.completed .disguise-name{color:var(--text-dim)}
+.disguise-img-wrap{position:relative;width:86px;height:86px}
+.disguise-img{width:86px;height:86px;object-fit:cover;object-position:top center;display:block;border:1px solid var(--border);background:var(--bg3)}
+.disguise-done-overlay{display:none;position:absolute;inset:0;background:rgba(200,16,46,.35);align-items:center;justify-content:center;font-size:20px}
+.disguise-card.completed .disguise-done-overlay{display:flex}
+.disguise-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase;text-align:center;line-height:1.2}
+.disguise-check-pos{position:absolute;top:7px;right:7px}
+
+/* ── CHECKBOX ── */
+.custom-check{width:20px;height:20px;border:1.5px solid var(--border-light);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.custom-check:hover{border-color:var(--red);background:rgba(200,16,46,.1)}
+.custom-check.checked{border-color:var(--red);background:var(--red)}
+.custom-check.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+/* Checkbox sobre imagem — fundo cinza quando não selecionado */
+.story-check-overlay .custom-check,
+.disguise-check-pos .custom-check{background:rgba(30,30,30,.72);border-color:rgba(180,180,180,.5)}
+.story-check-overlay .custom-check:hover,
+.disguise-check-pos .custom-check:hover{background:rgba(200,16,46,.25);border-color:var(--red)}
+.story-check-overlay .custom-check.checked,
+.disguise-check-pos .custom-check.checked{background:var(--red);border-color:var(--red)}
+
+
+/* ── GITHUB SYNC ── */
+.sync-indicator{position:fixed;bottom:22px;left:18px;display:flex;align-items:center;gap:8px;z-index:200;cursor:pointer}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);transition:background .3s;flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:pulse .8s infinite}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.err{background:var(--red)}
+.sync-dot.off{background:var(--text-dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;transition:color .3s}
+.sync-indicator:hover .sync-lbl{color:var(--text-muted)}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--bg3);border:1px solid var(--border-light);max-width:440px;width:100%;padding:28px;position:relative}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.15em;color:var(--gold-light);text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.modal-sub a{color:var(--blue);text-decoration:none}
+.modal-sub a:hover{text-decoration:underline}
+.modal-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg2);border:1px solid var(--border-light);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.modal-input:focus{border-color:var(--red)}
+.modal-input::placeholder{color:var(--text-dim)}
+.modal-row{display:flex;gap:8px}
+.modal-btn{flex:1;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;transition:background .15s}
+.modal-btn-save{background:var(--red);color:#fff}
+.modal-btn-save:hover{background:#e01535}
+.modal-btn-cancel{background:var(--border-light);color:var(--text-muted)}
+.modal-btn-cancel:hover{background:var(--border)}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-status{font-size:12px;margin-top:12px;min-height:16px;color:var(--text-dim)}
+.modal-status.ok{color:var(--green)}
+.modal-status.err{color:#ff7a8a}
+.modal-divider{height:1px;background:var(--border);margin:18px 0}
+.modal-danger{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--red);text-transform:uppercase;cursor:pointer;background:none;border:none;padding:0}
+.modal-danger:hover{text-decoration:underline}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:22px;right:18px;width:44px;height:44px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;transform:translateY(10px);box-shadow:0 4px 18px rgba(200,16,46,.35)}
+.fab.visible{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:36px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase}
+
+/* ══ RESPONSIVE ══ */
+@media(min-width:480px){
+  .story-item{grid-template-columns:134px 1fr}
+  .story-thumb{width:134px}
+  .challenge-head{grid-template-columns:70px 1fr auto auto}
+  .challenge-thumb-wrap{width:70px;height:70px}
+  .challenge-thumb{width:70px;height:70px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:102px;height:102px}
+}
+@media(min-width:640px){
+  .story-item{grid-template-columns:158px 1fr}
+  .story-thumb{width:158px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:116px;height:116px}
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- ═══ MISSÃO 03: THREE-HEADED SERPENT ═══ -->
+<div id="mission-3">
+  <div class="hero">
+    <img class="hero-img" src="3 Three-Headed Serpent/3_Three-Headed_Serpent_Cover.png" alt="Three-Headed Serpent" onerror="this.style.background='#1a1a1a'"/>
+    <div class="hero-overlay"></div>
+    <div class="hero-top">
+      <a class="back-btn" href="index.html">← Voltar</a>
+    </div>
+    <div class="hero-content">
+      <div class="hero-title-line">
+        <span class="hero-num">#3</span>
+        <span class="hero-title">Three-Headed Serpent</span>
+      </div>
+      <div class="hero-loc">Santa Fortuna · Colombia</div>
+    </div>
+  </div>
+
+  <div class="brief-strip">
+    <div class="targets-row">
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Rico Delgado</span>
+        </div>
+      </div>
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Jorge Franco</span>
+        </div>
+      </div>
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Andrea Martínez</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overall-prog">
+    <div class="overall-prog-inner">
+      <span class="overall-prog-lbl">Progresso Geral</span>
+      <span class="overall-prog-val" id="m3-overall-pct-lbl">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="m3-overall-prog-fill"></div></div>
+  </div>
+
+  <div class="mission-content">
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m3-body-stories')">
+        <div class="sec-header-text"><div class="sec-title">Mission Stories</div></div>
+        <div class="sec-prog" id="m3-prog-stories"><span>0</span> / 7</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-stories" id="m3-pf-stories"></div></div>
+      <div class="section-body open" id="m3-body-stories">
+        <div id="m3-stories-container"></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m3-body-intel')">
+        <div class="sec-header-text"><div class="sec-title">Intelligence</div></div>
+        <div class="sec-prog" id="m3-prog-intel"><span>0</span> / 53</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-intel" id="m3-pf-intel"></div></div>
+      <div class="section-body open" id="m3-body-intel">
+        <div class="intel-search-wrap">
+          <span class="intel-search-icon">🔎</span>
+          <input class="intel-search" type="text" placeholder="Buscar inteligência..." oninput="filterIntelM3(this.value)" autocomplete="off"/>
+        </div>
+        <div id="m3-intel-container"></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m3-body-challenges')">
+        <div class="sec-header-text"><div class="sec-title">Challenges</div></div>
+        <div class="sec-prog" id="m3-prog-challenges"><span>0</span> / 66</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-challenges" id="m3-pf-challenges"></div></div>
+      <div class="section-body open" id="m3-body-challenges">
+        <div class="challenge-filters" id="m3-challenge-filters">
+          <button class="cf-btn active" onclick="filterChallengesM3(this,'')">Todos</button>
+          <button class="cf-btn" onclick="filterChallengesM3(this,'A')">Assassinato</button>
+          <button class="cf-btn" onclick="filterChallengesM3(this,'D')">Descoberta</button>
+          <button class="cf-btn" onclick="filterChallengesM3(this,'F')">Feito</button>
+          <button class="cf-btn" onclick="filterChallengesM3(this,'T')">Target</button>
+          <button class="cf-btn" onclick="filterChallengesM3(this,'TC')">Clássico</button>
+          <button class="cf-btn" onclick="filterChallengesM3(this,'C47')">Codename 47</button>
+        </div>
+        <div id="m3-challenges-container"></div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m3-body-disguises')">
+        <div class="sec-header-text"><div class="sec-title">Disguises</div></div>
+        <div class="sec-prog" id="m3-prog-disguises"><span>0</span> / 19</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-disguises" id="m3-pf-disguises"></div></div>
+      <div class="section-body open" id="m3-body-disguises">
+        <div class="disguises-grid" id="m3-disguises-container"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ── SECTION TOGGLE ──
+function toggleSec(headerEl, bodyId) {
+  const body = document.getElementById(bodyId);
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  headerEl.classList.toggle('open', !open);
+}
+
+// ── SCROLL FAB ──
+window.addEventListener('scroll', () => {
+  const f = document.getElementById('fab');
+  f.classList.toggle('visible', window.scrollY > 250);
+}, {passive:true});
+
+const DATA_M3 = {
+  stories: [
+  {
+    title: 'Heart of Stone',
+    subtitle: 'Rico Delgado is due for an unveiling of a statue in the town square. Sounds promising.',
+    desc: 'The ever-classy Rico Delgado has commissioned a statue of himself to adorn the village square. Today\'s unveiling ceremony will feature a local band and Rico Delgado will attend in person. I suggest you take a close look, 47. This should be a unique opportunity to engage Delgado outside the walls of his compound.',
+  },
+  {
+    title: 'Submerged',
+    subtitle: 'A secret project? Surely this warrants attention.',
+    desc: 'An employee of the Delgado cartel was injured while working on a secret project in the caves beneath Santa Fortuna. Sounds intriguing. I suggest you locate this man\'s house, 47. Could be a chance to access the heart of the Delgado cartel.',
+  },
+  {
+    title: 'Deadly Art',
+    subtitle: 'Rico Delgado needs to have a tattoo fixed.',
+    desc: 'P-Power, celebrity tattooist of "Tattoo Torment" fame has come to Santa Fortuna. Presumably, to work his magic on Rico Delgado, a known ink enthusiast. Sounds like an invitation to the mansion, 47. Are you feeling expressive?',
+  },
+  {
+    title: 'Half Baked',
+    subtitle: 'A helicopter pilot lost a package belonging to Jorge Franco.',
+    desc: 'It sounds like the Delgado\'s helicopter pilot dropped a package over the jungle by mistake. A red box, containing circuit boards, for Jorge Franco\'s new cocaine processing machine. Hm, sounds like a workplace accident waiting to happen. Providing Franco can get his machine working.',
+  },
+  {
+    title: 'Backpacker',
+    subtitle: 'A drug smuggler has a meeting with Franco but needs to mend his sample first.',
+    desc: 'A drug dealer from Sapienza has been testing a new method for smuggling Delgado brand cocaine into Europe. Baking the substance into souvenirs, coated in a special anti-drug detection paint solution. However, he accidentally broke the souvenir on arrival and needs to mend it before going to see Franco.',
+  },
+  {
+    title: 'Undying Love',
+    subtitle: 'An old love affair ready to spark anew, 47? Rico Delgado\'s brother Héctor is trying to win back his old flame, Andrea Martínez.',
+    desc: 'Héctor has authored a rather slushy love letter, but one of the sicarios foolhardily stole it from Héctor\'s room during last night\'s party. I suggest you acquire that letter, 47. From what we know about Martínez, a declaration of love from Héctor is bound to provoke a reaction.',
+  },
+  {
+    title: 'Hallowed Ground',
+    subtitle: 'The local construction site needs a spiritual cleansing...',
+    desc: 'Andrea Martínez wants the local shaman to do a spirit cleanse at the construction site and she has ordered her sicarios to summon him, against his will, if necessary. I suggest you get involved, 47. After all, getting rid of bad influences is what you do best.',
+  },
+],
+  intelligence: [
+  { title: 'A Secret Project',               desc: '"An employee of the Delgado cartel was injured while working on a secret project in the caves beneath Santa Fortuna. Could be a chance to access the heart of the Delgado Cartel."' },
+  { title: 'Accommodation Check-In Details',  desc: '"A rather feisty booking detailing demands from Jorge Franco to the owner of the hostel. Franco demands a range of items for a guest of his, who is apparently staying at the hostel. The demands detail a reservation for the premium suite above the reception, plenty of fruit baskets and the addition of a bong to be made available at all times. The booking indicates that Franco\'s business partner has checked in."' },
+  { title: 'Bar Basement Key',               desc: '"A key. Grants access to the bar\'s basement."' },
+  { title: 'Botany Lab Keycard',              desc: '"Keycard to access Jorge Franco\'s botany lab."' },
+  { title: 'Builder\'s Strike',              desc: '"While digging out for the foundation work on the new water treatment plant, workers have uncovered a possible old burial site. Worried that they may anger the spirits in the burial site, the workers have gone on strike, much to the chagrin of the foreman and, presumably, Martínez."' },
+  { title: 'Cartel Lockups Key',             desc: '"A key. Grants access to the cartel lockup in the village."' },
+  { title: 'Caves Keycard',                  desc: '"Keycard to access the locked off cave system under the village."' },
+  { title: 'Celebrity Ink',                  desc: '"P-Power; celebrity tattooist of "Tattoo Torment" fame has come to Santa Fortuna. Presumably, to work his magic on Rico Delgado, a known ink enthusiast. Sounds like an invitation to the mansion."' },
+  { title: 'Circuit Board',                  desc: '"A fresh circuit board used in some kind of large machinery."' },
+  { title: 'Cocaine Machine Blueprints',     desc: '"The cartel looks to be automating their cocaine production. The machine blueprint shows that raw cocaine powder is inserted at one end and processed by the machine. Once the processing is complete, the machine spits out a perfect brick of pure cocaine."' },
+  { title: 'Cocaine Souvenir Recipe',        desc: '"A recipe for how to mold cocaine into a variety of souvenir products, written by Jorge Franco. The biggest issue so far is the fragility of the product but Franco feels he has a solution and is using \'his European contact\' to test the quality of the mold."' },
+  { title: 'Combination for Rico Delgado\'s Safe', desc: '"A yellow note with the numbers 28, 02 and 04 scribbled on it. It\'s the combination to Rico Delgado\'s office safe."' },
+  { title: 'Construction Equipment Brochure', desc: '"A brochure detailing a state-of-the-art concrete mixer. This model has a particularly powerful pump attached, capable of pouring substantial amounts of concrete at a very high speed. The safety instructions indicate that no one should ever stand in front of the machine while it\'s operating."' },
+  { title: 'Construction Storage Key',       desc: '"A key. Opens a locked storage container on the construction site."' },
+  { title: 'Deceased Drummer',               desc: '"One of the band members hired to play at the statue unveiling has met with either an accident or has been drinking too heavily, causing some sort of fatal heart attack. Now the band is missing a drummer."' },
+  { title: 'Delgado\'s Statue',              desc: '"The ever-classy Rico Delgado has commissioned a statue of himself to adorn the village square. Today\'s unveiling ceremony will feature a local band and Rico Delgado will attend in person. This should be a unique opportunity to engage Delgado outside the walls of his compound."' },
+  { title: 'Drug Experiment Report',         desc: '"A report from Jorge Franco to Rico Delgado indicates that Franco is on the verge of a major breakthrough in his efforts to create a \'super cocaine\'. His White Stallion brand of cocaine is being infused with the sap from a rare plant found locally and Franco is convinced it\'s the missing piece."' },
+  { title: 'Drug Smuggler Memo',             desc: '"A small note detailing a plan to smuggle a small souvenir through customs and airports around the world. Apparently, the souvenir is cast from pure cocaine and is to be delivered back, intact, to Jorge Franco, the cartel\'s chief chemist, for some sort of unspecified taste test."' },
+  { title: 'Drummer\'s House Key',           desc: '"A key. Grants access to the drummer\'s house in Santa Fortuna."' },
+  { title: 'Franco\'s Drug Notes',           desc: '"Jorge Franco is something of an amateur horticulturalist. His notes around these subjects are very detailed. It looks like he\'s been exploring a large portion of the jungle in his efforts to find plants to use, and one in particular has caught his attention. A rare plant only found in a single location in the jungle, overlooking a steep drop off a cliff."' },
+  { title: 'Franco\'s Experiments',         desc: '"It seems that Jorge Franco spends time hunting for unusual plants in the jungle. One plant in particular looks to have caught his eye — a rare plant that grows on the edge of a cliff nearby the coca plantation."' },
+  { title: 'Franco\'s Hut Key',             desc: '"A key to Jorge Franco\'s hut."' },
+  { title: 'Franco\'s Taste Buds',          desc: '"According to people in the know, Jorge Franco uses his acute sense of taste to test the quality of his own product."' },
+  { title: 'Glue',                           desc: '"A tube of adhesive that can be used to tie various substances together."' },
+  { title: 'Héctor Delgado and Andrea Martínez', desc: '"Héctor Delgado and Andrea Martínez used to be an item but they have since split up. Héctor, however, seems intent on winning her back and so has been showering Martínez with gifts of all kinds. Martínez has so far refused his advances."' },
+  { title: 'Helicopter Cargo Manifest',      desc: '"A detailed list of cargo recently transported from Bogota to the cartel compound. One of the items, a red box containing a replacement circuit board, is listed as unaccounted for. A note indicates the box may have dropped from the helicopter while flying over the jungle."' },
+  { title: 'Hippo Behaviour Notes',          desc: '"A notebook containing details on Rico Delgado\'s pet hippo and its recent behavior. Delgado has been feeding the hippo lots of meat, which has resulted in altered behavior in the animal. It now keeps mostly to itself, only coming out when lured with meat. The notes conclude that the animal has somehow developed an addiction of some sort."' },
+  { title: 'Hippo Whisperer',               desc: '"Rico Delgado\'s pet hippo, Mijo, has become sick. Delgado has tried a number of different things to make it better but nothing has proved to work. He has now gone to the extreme of hiring a \'hippo whisperer\' who is currently trying to connect with the animal."' },
+  { title: 'Hostel Master Key',             desc: '"A master key. Will unlock all rooms in the hostel in Santa Fortuna."' },
+  { title: 'Interrogation Recording',        desc: '"A recording of Rico Delgado\'s recent interrogation of Oscar Wong, Ether\'s chief biochemist."' },
+  { title: 'Lost Parcel',                   desc: '"It sounds like the Delgado\'s helicopter pilot dropped a package over the jungle by mistake. A red box containing circuit boards for Jorge Franco\'s new cocaine processing machine. Sounds like a workplace accident waiting to happen."' },
+  { title: 'Love Letter',                   desc: '"Rico Delgado\'s brother Héctor is trying to win his old flame, Andrea Martínez. Apparently, Héctor has authored a rather slushy love letter, but one of the sicarios foolheartedly stole it from Héctor\'s room during last night\'s party."' },
+  { title: 'Mansion Gate Key',              desc: '"Key to the Gate leading to the Delgado compound."' },
+  { title: 'Martínez\'s Office Key',        desc: '"A key. Opens the gate leading to Andrea Martinez\'s office."' },
+  { title: 'Missing Circuit Board',         desc: '"Jorge Franco is expecting a replacement part for a cocaine production machine. But the part fell from the helicopter while being transported to the cocaine production fields. Now, he needs someone to go find the red box with the circuit boards."' },
+  { title: 'Pharmacy Key',                  desc: '"A key. Grants access to the local pharmacy."' },
+  { title: 'Picture of Héctor Delgado and Andrea Martínez', desc: '"A photograph of Hector Delgado and Andrea Martinez. It looks like the two had some sort of intimate relationship when the picture was taken."' },
+  { title: 'Rico Delgado\'s Tattoo',        desc: '"It seems that Catalina Delgado is not a big fan of her husband\'s neck tattoo of her. He had it made when she was younger and according to one of the housekeepers, it reminds her too much of how much she\'s aged."' },
+  { title: 'Safe Combination',              desc: '"The combination for the Vanisher\'s safe."' },
+  { title: 'Scooter Key',                   desc: '"A key for a scooter. Could be a handy getaway vehicle."' },
+  { title: 'Shaman\'s Hut Key',            desc: '"A key. Grants access to the Shaman\'s hut."' },
+  { title: 'Shaman\'s Notes on Flowers',   desc: '"A few handwritten notes on the various types of flora found in the area near the Shaman\'s hut. Details include medicinal properties, how to correctly harvest the plants, and how to prepare them for the various infusions used by the Shaman. A note indicates that the purple flowers growing close by are extremely poisonous."' },
+  { title: 'Shop Key',                      desc: '"A key. Grants access to the closed shop in Santa Fortuna."' },
+  { title: 'Speedboat Key',                 desc: '"Key to an expensive speedboat. Could be one of those moored behind Delgado\'s mansion."' },
+  { title: 'Spiritual Cleansing',           desc: '"Andrea Martinez wants the local shaman to do a spirit cleanse at the construction site and she has ordered her sicarios to summon him, against his will, if necessary."' },
+  { title: 'Statue Unveiling',              desc: '"The Delgado cartel has decided to donate a statue to the village. There is going to be an unveiling in the town square where Rico Delgado will likely say a few things while presenting his gift to the villagers."' },
+  { title: 'Submarine',                     desc: '"A villager claims to have seen something large emerge from under a local waterfall close to the village. His friend insists it\'s a submarine used by the cartel for various nefarious purposes."' },
+  { title: 'Submarine Blueprints',          desc: '"A set of blueprints with details on a small submarine. The layout of the sub would make it ideal for stealth transportation of drugs, but modifications to the design also seem to indicate that it is designed to transport personnel."' },
+  { title: 'Submarine Engineer\'s Key',    desc: '"A key. Opens the Submarine Engineer\'s house."' },
+  { title: 'Submarine Safety Procedure',   desc: '"A report covering details of an unsafe rig used to support a small submarine. The rig is still unstable but the submarine has now been outfitted with an engine limiter, which should reduce the risk of the rig breaking down again."' },
+  { title: 'The Drug Mule',                desc: '"A drug dealer from Sapienza has been testing a new method for smuggling Delgado brand cocaine into Europe. Baking the substance into souvenirs, coated in a special anti-drug detection paint solution. However, he accidentally broke the souvenir on arrival and needs to mend it before going to see Franco."' },
+  { title: 'Truck Key',                    desc: '"Key to a pickup truck. Could be useful for exfiltration."' },
+  { title: 'Unstable Statue',             desc: '"The foundation built for the statue, which is supposed to be unveiled by Rico Delgado, is seemingly very unstable and built using cheap materials."' },
+],
+  challenges: [
+  // ── ASSASSINATION (25) ──
+  { name: 'Caution: Heavy Machinery',  type: 'A',  desc: 'Assassinate Jorge Franco by pushing him into his cocaine machine.',                                                                                                              xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Splash Landing',            type: 'A',  desc: 'Assassinate Rico Delgado in a submarine accident.',                                                                                                                             xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'A Strong Foundation',       type: 'A',  desc: 'Assassinate Andrea Martínez in a cement mixer accident.',                                                                                                                       xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Exit, Stage Left',          type: 'A',  desc: 'Assassinate both Rico Delgado and Andrea Martínez with Rico Delgado\'s statue.',                                                                                                xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Deadlier Art',              type: 'A',  desc: 'Assassinate Rico Delgado with the art in his lobby.',                                                                                                                           xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Still as a Statue',         type: 'A',  desc: 'Assassinate Rico Delgado with a statue of himself.',                                                                                                                            xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Hard Hat Area',             type: 'A',  desc: 'Assassinate Andrea Martínez by dropping an object suspended from a crane.',                                                                                                     xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mind the Step',             type: 'A',  desc: 'Assassinate Jorge Franco by pushing him off a cliff as he searches for rare flowers.',                                                                                          xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'It Looks Just like Her',    type: 'A',  desc: 'Assassinate Rico Delgado with a tattoo gun.',                                                                                                                                   xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Special Delivery',          type: 'A',  desc: 'Place the explosive package in the in-tray within Andrea Martínez\'s office.\nAssassinate Andrea Martínez with an explosive package.',                                         xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Bait and Switch',           type: 'A',  desc: 'Assassinate Andrea Martínez by pushing her off her balcony.',                                                                                                                   xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'A Bite Out of Crime',       type: 'A',  desc: 'Assassinate Rico Delgado by pushing him into the hippo pool.',                                                                                                                  xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Secret Ingredient',     type: 'A',  desc: 'Assassinate Jorge Franco by poisoning the cocaine bus souvenir.',                                                                                                               xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Hold My Hair',              type: 'A',  desc: 'Assassinate a target by drowning them in Santa Fortuna.',                                                                                                                       xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Blowing Bubbles',           type: 'A',  desc: 'Eliminate Catalina Delgado by drowning her in her hot tub.',                                                                                                                    xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Tasteless, Traceless',      type: 'A',  desc: 'Assassinate a target with lethal poison in Santa Fortuna.',                                                                                                                     xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Straight Shot',             type: 'A',  desc: 'Assassinate a target with a headshot in Santa Fortuna.',                                                                                                                        xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'We Meat Again',             type: 'A',  desc: 'Incapacitate the meat enthusiast with a meaty bone.\nFeed him to the piranhas.',                                                                                                xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Healing',               type: 'SS', desc: 'While disguised as the Shaman, eliminate 10 different Coca Field Guards while they are among the coca field crops.',                                                            xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Authentic Local Cuisine',   type: 'A',  desc: 'Eliminate someone with poisoned street food.',                                                                                                                                  xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Hallowed Ground',       type: 'SS', desc: 'Push 3 people into the construction site pit while disguised as the Shaman.',                                                                                                   xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Piano Man',                 type: 'A',  desc: 'Assassinate a target with the fiber wire in Santa Fortuna.',                                                                                                                    xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Versatile Assassin',        type: 'A',  desc: 'Complete the following Versatile challenges in Santa Fortuna:\nPiano Man\nSomeone Could Hurt Themselves\nHold My Hair\nStraight Shot\nTasteless, Traceless',                    xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Off the Wagon',             type: 'A',  desc: 'Eliminate Héctor Delgado by poisoning a line of cocaine.',                                                                                                                      xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Someone Could Hurt Themselves', type: 'A', desc: 'Assassinate a target in an accident in Santa Fortuna.',                                                                                                                     xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  // ── DISCOVERY (6) ──
+  { name: 'Plain Sailing',             type: 'D',  desc: 'Escape on a speed boat.',                                                                                                                                                       xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Wind in Your Hair',     type: 'D',  desc: 'Escape in one of Rico Delgado\'s sports cars.',                                                                                                                                 xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Chameleon',                 type: 'D',  desc: 'Find and equip all disguises in Santa Fortuna.',                                                                                                                                xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Pop a Wheelie',             type: 'D',  desc: 'Escape on a motorbike.',                                                                                                                                                        xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Low Mileage',               type: 'D',  desc: 'Escape in a local\'s car.',                                                                                                                                                     xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Discover Santa Fortuna',    type: 'D',  desc: 'Reveal all undiscovered areas in Santa Fortuna.',                                                                                                                               xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  // ── FEATS (26) ──
+  { name: 'It Looks Nothing like Her',       type: 'F',  desc: 'Gain access to the mansion as the Tattooist.',                                                                             xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Deadly Art',      type: 'F',  desc: 'Impersonate a reality star tattooist as Rico Delgado honors his wife with a love tattoo.',                                xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Submerged',       type: 'F',  desc: 'A secret project? Surely this warrants attention.',                                                                        xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Feedin\' Time',                  type: 'F',  desc: 'Make the hippo feel better.',                                                                                               xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Fly Tipping',                    type: 'F',  desc: 'Feed a Street Soldier to the piranhas.\nFeed a Mansion Guard to the piranhas.\nFeed a Coca Field Guard to the piranhas.\nFeed an Elite Guard to the piranhas.\nDo not get spotted.', xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'A Brief History of Rico Delgado',type: 'F',  desc: 'Listen to all of the displays in Rico Delgado\'s Trophy Room.',                                                             xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Secret Tunnel',                  type: 'F',  desc: '[REDACTED]',                                                                                                                xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'How Ribbiting',                  type: 'F',  desc: 'Catch 5 frogs.',                                                                                                            xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Undying Love',   type: 'F',  desc: 'An old love affair ready to spark anew, 47?',                                                                               xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Got Any ID?',                    type: 'F',  desc: 'Gain access to the cave system as the Hippie.',                                                                             xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Who Ya Gonna Call?',             type: 'F',  desc: 'Talk to Andrea Martínez disguised as the Shaman.',                                                                          xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Drown Your Sorrows',             type: 'F',  desc: 'Listen to P. Power while he tells you about his problems.',                                                                 xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Cog in the Machine',             type: 'F',  desc: 'Recover Franco\'s missing circuit board.',                                                                                  xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Brick and Mortar',               type: 'F',  desc: 'Collect 3 bloodstained cocaine bricks.',                                                                                    xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Half Baked',     type: 'F',  desc: 'A helicopter pilot lost a package belonging to Jorge Franco.',                                                              xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Backpacker',     type: 'F',  desc: 'A drug smuggler has a meeting with Jorge Franco but needs to mend his sample first.',                                       xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Key Master',                     type: 'F',  desc: 'Unlock all of the secret doors located around Santa Fortuna.',                                                              xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: '20,000 Leagues Under the Ground',type: 'F',  desc: 'Enter the submarine cave as the Submarine Engineer.',                                                                       xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Salt the Earth',                 type: 'F',  desc: 'Destroy Franco\'s rare flower sample.',                                                                                     xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Hallowed Grounds',type: 'F', desc: 'Perform a spiritual cleansing as a holy man of the jungle.',                                                                xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Nature Finds a Way',             type: 'F',  desc: 'Pacify 5 different Coca Field Guards while they are among the coca field crops.',                                           xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'On a Pedestal',                  type: 'F',  desc: 'Loosen Rico Delgado\'s statue.',                                                                                            xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Don\'t Shoot the Messenger',    type: 'F',  desc: 'Find Héctor Delgado\'s love letter.',                                                                                        xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Cupid',                          type: 'F',  desc: 'Help Héctor Delgado find his love letter.',                                                                                 xp: '+1000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Mission Story - Heart of Stone', type: 'F',  desc: 'Sabotage Rico Delgado\'s statue unveiling ceremony.',                                                                       xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Feel Good Hit of the Stunner',   type: 'IWTB', desc: 'Pacify each Band Member with a Cocaine Brick, while disguised as a Musician.',                                           xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  // ── TARGETS (3) ──
+  { name: 'The Cook',                  type: 'T',  desc: 'Assassinate Jorge Franco.',                                                                                                                                                     xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Face',                  type: 'T',  desc: 'Assassinate Andrea Martínez.',                                                                                                                                                  xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Boss',                  type: 'T',  desc: 'Assassinate Rico Delgado.',                                                                                                                                                     xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  // ── THE CLASSICS (5) ──
+  { name: 'Sniper Assassin',           type: 'TC', desc: 'Complete "Three-headed Serpent".\nAssassinate your targets with a sniper rifle.\nOnly eliminate targets.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.',                                      xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Silent Assassin',           type: 'TC', desc: 'Complete "Three-headed Serpent".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.',                                                                xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'The Classics',             type: 'TC', desc: 'Complete all the Classic challenges on "Three-headed Serpent":\nSilent Assassin\nSilent Assassin, Suit Only\nSniper Assassin\nSuit Only',                                                                                              xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Silent Assassin, Suit Only',type: 'TC', desc: 'Complete "Three-headed Serpent".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.\nDo it all in your suit.',                                       xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  { name: 'Suit Only',                 type: 'TC', desc: 'Assassinate the targets and complete the mission.\nDo it all in your suit.',                                                                                                     xp: '+4000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+  // ── CODENAME 47 (1) ──
+  { name: 'Say Hello to my Little Friend', type: 'C47', desc: 'Complete "The Red Dragon".\nLocate and obtain the Gold Idol in Santa Fortuna.\nUse it to pacify the Shaman.',                                                             xp: '+2000XP', item: null, itemImg: null, img: '3 Three-Headed Serpent/Challenges/' },
+],
+  disguises: [
+  { name: 'Casual Tourist (Starting suit)', img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Barman',                         img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Chef',                           img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Coca Field Guard',               img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Coca Field Worker',              img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Construction Worker',           img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Drug Lab Worker',               img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Drummer',                        img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Elite Guard',                   img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Gardener',                       img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Hippie',                         img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Hippo Whisperer',               img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Mansion Guard',                 img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Mansion Staff',                 img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Shaman',                         img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Street Soldier',               img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Submarine Crew',               img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Submarine Engineer',           img: '3 Three-Headed Serpent/Disguises/' },
+  { name: 'Tattooist',                     img: '3 Three-Headed Serpent/Disguises/' },
+]
+};
+
+const stateM3 = { stories:new Set(), intelligence:new Set(), challenges:new Set(), disguises:new Set() };
+
+function saveStateM3() {
+  localStorage.setItem('hitman_m3_v1', JSON.stringify({
+    stories:[...stateM3.stories], intelligence:[...stateM3.intelligence],
+    challenges:[...stateM3.challenges], disguises:[...stateM3.disguises]
+  }));
+}
+function loadStateM3() {
+  try {
+    const s = JSON.parse(localStorage.getItem('hitman_m3_v1')||'{}');
+    stateM3.stories      = new Set(s.stories||[]);
+    stateM3.intelligence = new Set(s.intelligence||[]);
+    stateM3.challenges   = new Set(s.challenges||[]);
+    stateM3.disguises    = new Set(s.disguises||[]);
+  } catch(e){}
+}
+
+function mkCheckM3(cat, id) {
+  const el = document.createElement('div');
+  el.className = 'custom-check' + (stateM3[cat].has(id) ? ' checked' : '');
+  el.onclick = function(e) {
+    e.stopPropagation();
+    if (stateM3[cat].has(id)) { stateM3[cat].delete(id); el.classList.remove('checked'); }
+    else { stateM3[cat].add(id); el.classList.add('checked'); }
+    saveStateM3(); updateProgressM3();
+    const row = el.closest('.story-item,.intel-item,.challenge-card,.disguise-card');
+    if (row) row.classList.toggle('completed', stateM3[cat].has(id));
+  };
+  return el;
+}
+
+function updateProgressM3() {
+  const cats = [
+    ['stories',      'm3-prog-stories',    'm3-pf-stories'],
+    ['intelligence', 'm3-prog-intel',      'm3-pf-intel'],
+    ['challenges',   'm3-prog-challenges', 'm3-pf-challenges'],
+    ['disguises',    'm3-prog-disguises',  'm3-pf-disguises'],
+  ];
+  cats.forEach(([cat, progId, pfId]) => {
+    const total = DATA_M3[cat].length;
+    const done  = stateM3[cat].size;
+    const prog  = document.getElementById(progId);
+    const pf    = document.getElementById(pfId);
+    if (prog) prog.innerHTML = `<span>${done}</span> / ${total}`;
+    if (pf)   pf.style.width = total ? (done/total*100)+'%' : '0%';
+  });
+  const allTotal = cats.reduce((s,[cat]) => s + DATA_M3[cat].length, 0);
+  const allDone  = cats.reduce((s,[cat]) => s + stateM3[cat].size, 0);
+  const pct = allTotal > 0 ? Math.round(allDone/allTotal*100) : 0;
+  const opf = document.getElementById('m3-overall-prog-fill');
+  const opl = document.getElementById('m3-overall-pct-lbl');
+  if (opf) opf.style.width = pct + '%';
+  if (opl) opl.textContent = pct + '%';
+}
+
+function renderStoriesM3() {
+  const c = document.getElementById('m3-stories-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M3.stories.forEach((s,i) => {
+    const id = 'm3_story_'+i;
+    const el = document.createElement('div');
+    el.className = 'story-item' + (stateM3.stories.has(id) ? ' completed' : '');
+    const tw = document.createElement('div'); tw.className = 'story-thumb-wrap';
+    const img = document.createElement('img'); img.className = 'story-thumb';
+    img.src = s.img; img.alt = s.title; img.onerror = function(){ this.style.background='#1a1a1a'; };
+    const co = document.createElement('div'); co.className = 'story-check-overlay';
+    co.appendChild(mkCheckM3('stories', id));
+    tw.appendChild(img); tw.appendChild(co);
+    const body = document.createElement('div'); body.className = 'story-body';
+    body.innerHTML = `<div class="story-title">${s.title}</div>
+      <div class="story-subtitle-tag">${s.subtitle}</div>
+      <div class="story-desc">${s.desc}</div>`;
+    el.appendChild(tw); el.appendChild(body); c.appendChild(el);
+  });
+}
+
+function renderIntelM3(filter='') {
+  const c = document.getElementById('m3-intel-container'); if(!c) return;
+  c.innerHTML = '';
+  const lf = filter.toLowerCase();
+  DATA_M3.intelligence.forEach((item,i) => {
+    if (lf && !item.title.toLowerCase().includes(lf) && !item.desc.toLowerCase().includes(lf)) return;
+    const id = 'm3_intel_'+i;
+    const el = document.createElement('div');
+    el.className = 'intel-item' + (stateM3.intelligence.has(id) ? ' completed' : '');
+    const cw = document.createElement('div'); cw.className = 'intel-check';
+    cw.appendChild(mkCheckM3('intelligence', id));
+    const body = document.createElement('div'); body.className = 'intel-body';
+    body.innerHTML = `<div class="intel-title">${item.title}</div><div class="intel-desc">${item.desc}</div>`;
+    el.appendChild(cw); el.appendChild(body); c.appendChild(el);
+  });
+  if (!c.children.length) c.innerHTML = '<div class="empty-state">Nenhum resultado encontrado</div>';
+}
+function filterIntelM3(v) { renderIntelM3(v); }
+
+function renderChallengesM3(typeFilter) {
+  const c = document.getElementById('m3-challenges-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M3.challenges.forEach((ch,i) => {
+    if (typeFilter && ch.type !== typeFilter) return;
+    const id = 'm3_challenge_'+i;
+    const card = document.createElement('div');
+    card.className = 'challenge-card' + (stateM3.challenges.has(id) ? ' completed' : '');
+    const head = document.createElement('div'); head.className = 'challenge-head';
+    head.onclick = function(){ card.classList.toggle('expanded'); };
+    const tw = document.createElement('div'); tw.className = 'challenge-thumb-wrap';
+    const thumb = document.createElement('img'); thumb.className = 'challenge-thumb';
+    thumb.src = ch.img; thumb.alt = ch.name; thumb.onerror = function(){ this.style.background='#1a1a1a'; };
+    tw.appendChild(thumb);
+    const hb = document.createElement('div'); hb.className = 'challenge-head-body';
+    hb.innerHTML = `<div class="challenge-name"><span class="challenge-type-dot dot-${ch.type}"></span>${ch.name}</div>
+      <div class="challenge-xp">${ch.xp}</div>`;
+    const cc = document.createElement('div'); cc.className = 'challenge-check-col';
+    cc.appendChild(mkCheckM3('challenges', id));
+    const ec = document.createElement('div'); ec.className = 'challenge-expand-col'; ec.innerHTML = '▼';
+    head.appendChild(tw); head.appendChild(hb); head.appendChild(cc); head.appendChild(ec);
+    const body = document.createElement('div'); body.className = 'challenge-body-content';
+    const lines = ch.desc.split('\n');
+    const rest = lines.slice(1);
+    const descHtml = rest.length
+      ? `<ul style="margin:6px 0 0 16px;padding:0">${rest.map(l=>`<li>${l}</li>`).join('')}</ul>`
+      : '';
+    body.innerHTML = `<div class="challenge-desc-text">${lines[0]}${descHtml}</div>`;
+    card.appendChild(head); card.appendChild(body); c.appendChild(card);
+  });
+}
+function filterChallengesM3(btn, type) {
+  document.querySelectorAll('#m3-body-challenges .cf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChallengesM3(type);
+}
+
+function renderDisguisesM3() {
+  const c = document.getElementById('m3-disguises-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M3.disguises.forEach((d,i) => {
+    const id = 'm3_disguise_'+i;
+    const card = document.createElement('div');
+    card.className = 'disguise-card' + (stateM3.disguises.has(id) ? ' completed' : '');
+    card.onclick = function(e) {
+      if (e.target.closest('.disguise-check-pos')) return;
+      const chkEl = card.querySelector('.custom-check');
+      if (!chkEl) return;
+      if (stateM3['disguises'].has(id)) { stateM3['disguises'].delete(id); chkEl.classList.remove('checked'); }
+      else { stateM3['disguises'].add(id); chkEl.classList.add('checked'); }
+      saveStateM3();
+      card.classList.toggle('completed', stateM3['disguises'].has(id));
+      updateProgressM3();
+    };
+    const wrap = document.createElement('div'); wrap.className = 'disguise-img-wrap';
+    const img = document.createElement('img'); img.className = 'disguise-img';
+    img.src = d.img; img.alt = d.name; img.onerror = function(){ this.style.background='#1a1a1a'; };
+    const done = document.createElement('div'); done.className = 'disguise-done-overlay'; done.textContent = '✓';
+    const chkPos = document.createElement('div'); chkPos.className = 'disguise-check-pos';
+    chkPos.appendChild(mkCheckM3('disguises', id));
+    wrap.appendChild(img); wrap.appendChild(done);
+    const name = document.createElement('div'); name.className = 'disguise-name'; name.textContent = d.name;
+    card.appendChild(wrap); card.appendChild(name); card.appendChild(chkPos);
+    c.appendChild(card);
+  });
+}
+
+// ── INIT M3 ──
+loadStateM3();
+renderStoriesM3();
+renderIntelM3();
+renderChallengesM3('');
+renderDisguisesM3();
+updateProgressM3();
+</script>
+
+</body>
+</html>

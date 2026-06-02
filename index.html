@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>HITMAN 2 — Mission Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --red: #c8102e;
+  --red-glow: rgba(200,16,46,0.4);
+  --red-dim: rgba(200,16,46,0.15);
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --bg: #0e0e0e;
+  --bg2: #141414;
+  --bg3: #1a1a1a;
+  --bg4: #1f1f1f;
+  --border: #252525;
+  --border-light: #333;
+  --text: #f0f0f0;
+  --text-muted: #b8b8b8;
+  --text-dim: #6a6a6a;
+  --blue: #4a9edd;
+  --blue-dim: rgba(74,158,221,0.15);
+  --green: #4ecb7a;
+  --green-dim: rgba(78,203,122,0.12);
+  --purple: #a87fd4;
+  --purple-dim: rgba(168,127,212,0.12);
+  --orange: #e07b3a;
+  --orange-dim: rgba(224,123,58,0.12);
+  --teal: #4ecfb8;
+  --teal-dim: rgba(78,207,184,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
+
+/* ══ HOME ══ */
+#home{min-height:100vh;position:relative}
+.home-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,16,46,.1) 0%,transparent 65%),var(--bg)
+}
+.home-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 100px}
+
+/* Mission card — destaque (missão ativa) */
+.mission-card-home{
+  position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid var(--border);
+  transition:border-color .3s,transform .2s;
+  animation:slideUp .5s .1s cubic-bezier(.16,1,.3,1) both;
+  margin-top:8px;
+  display:block;
+  text-decoration:none;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mission-card-home:hover{border-color:var(--red);transform:translateY(-2px)}
+.mission-card-home:active{transform:scale(.99)}
+.mission-cover-home{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-home:hover .mission-cover-home{transform:scale(1.03)}
+.mission-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.08) 100%)}
+.red-scan{position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(to right,transparent,var(--red),transparent);animation:scan 3.5s 1s infinite}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.prog-ring-wrap{position:absolute;top:12px;right:12px;width:62px;height:62px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.prog-ring-bg{fill:rgba(40,40,40,.65);stroke:rgba(255,255,255,.12);stroke-width:3}
+.prog-ring-fill{fill:none;stroke:var(--red);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:163.4;stroke-dashoffset:163.4;transform:rotate(-90deg);transform-origin:31px 31px;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.prog-ring-pct{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+.mission-info-home{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.mission-title-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-home-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-home{font-size:13px;color:var(--text-muted);letter-spacing:.08em;margin-top:5px}
+
+/* Missions section label */
+.missions-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.45em;color:var(--text-dim);text-transform:uppercase;margin-top:16px;margin-bottom:0;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Missions list */
+.mission-card-sm{position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s,transform .2s;display:block;width:100%;margin-top:8px;text-decoration:none;}
+.mission-card-sm:hover{border-color:rgba(200,16,46,.5);transform:translateY(-2px)}
+.mission-card-sm:active{transform:scale(.98)}
+.mission-cover-sm{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-sm:hover .mission-cover-sm{transform:scale(1.04)}
+.mission-overlay-sm{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.15) 60%,transparent 100%)}
+.mission-info-sm{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:8px;flex-shrink:0}
+.mission-title-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-sm{font-size:13px;color:var(--text-muted);letter-spacing:.07em;margin-top:4px}
+.mission-soon-badge{position:absolute;top:14px;right:14px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;background:rgba(0,0,0,.7);border:1px solid var(--border-light);padding:4px 10px;backdrop-filter:blur(6px)}
+
+.home-banner{display:block;width:100%;aspect-ratio:616/353;object-fit:cover;background:var(--bg3);border:1px solid var(--border);margin-bottom:0}
+
+/* Stats */
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-top:none;background:var(--border);animation:slideUp .5s .2s cubic-bezier(.16,1,.3,1) both;margin-bottom:0}
+.stat-box{background:#222;padding:12px 8px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:3px}
+
+/* ── GITHUB SYNC ── */
+.sync-indicator{position:fixed;bottom:22px;left:18px;display:flex;align-items:center;gap:8px;z-index:200;cursor:pointer}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);transition:background .3s;flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:pulse .8s infinite}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.err{background:var(--red)}
+.sync-dot.off{background:var(--text-dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;transition:color .3s}
+.sync-indicator:hover .sync-lbl{color:var(--text-muted)}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--bg3);border:1px solid var(--border-light);max-width:440px;width:100%;padding:28px;position:relative}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.15em;color:var(--gold-light);text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.modal-sub a{color:var(--blue);text-decoration:none}
+.modal-sub a:hover{text-decoration:underline}
+.modal-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg2);border:1px solid var(--border-light);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.modal-input:focus{border-color:var(--red)}
+.modal-input::placeholder{color:var(--text-dim)}
+.modal-row{display:flex;gap:8px}
+.modal-btn{flex:1;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;transition:background .15s}
+.modal-btn-save{background:var(--red);color:#fff}
+.modal-btn-save:hover{background:#e01535}
+.modal-btn-cancel{background:var(--border-light);color:var(--text-muted)}
+.modal-btn-cancel:hover{background:var(--border)}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-status{font-size:12px;margin-top:12px;min-height:16px;color:var(--text-dim)}
+.modal-status.ok{color:var(--green)}
+.modal-status.err{color:#ff7a8a}
+.modal-divider{height:1px;background:var(--border);margin:18px 0}
+.modal-danger{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--red);text-transform:uppercase;cursor:pointer;background:none;border:none;padding:0}
+.modal-danger:hover{text-decoration:underline}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:36px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME ═══ -->
+<div id="home">
+  <div class="home-bg"></div>
+  <div class="home-wrap">
+    <img class="home-banner" src="Index_IMG.jpg" alt="HITMAN — World of Assassination" onerror="this.style.background='#1a1a1a'"/>
+
+    <div class="home-stats">
+      <div class="stat-box"><div class="stat-val" id="hs-stories">—</div><div class="stat-lbl">Stories</div></div>
+      <div class="stat-box"><div class="stat-val" id="hs-intel">—</div><div class="stat-lbl">Intel</div></div>
+      <div class="stat-box"><div class="stat-val" id="hs-challenges">—</div><div class="stat-lbl">Desafios</div></div>
+      <div class="stat-box"><div class="stat-val" id="hs-disguises">—</div><div class="stat-lbl">Disfarces</div></div>
+    </div>
+
+    <div class="missions-label">Hitman 2 — Missões</div>
+
+    <!-- Missão 01 — com dados -->
+    <a class="mission-card-sm" href="m1.html">
+      <img class="mission-cover-sm" src="1 Nightcall/1_Nightcall_Cover.png" alt="Nightcall" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#1</span>
+          <span class="mission-title-sm">Nightcall</span>
+        </div>
+        <div class="mission-loc-sm">Hawke's Bay · New Zealand</div>
+      </div>
+    </a>
+
+    <!-- Missão 02 — com dados -->
+    <a class="mission-card-sm" href="m2.html">
+      <img class="mission-cover-sm" src="2 The Finish Line/2_The_Finish_Line_Cover.png" alt="The Finish Line" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#2</span>
+          <span class="mission-title-sm">The Finish Line</span>
+        </div>
+        <div class="mission-loc-sm">Miami · Florida, U.S.A.</div>
+      </div>
+    </a>
+
+    <!-- Missão 03 — com dados -->
+    <a class="mission-card-sm" href="m3.html">
+      <img class="mission-cover-sm" src="3 Three-Headed Serpent/3_Three-Headed_Serpent_Cover.png" alt="Three-Headed Serpent" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#3</span>
+          <span class="mission-title-sm">Three-Headed Serpent</span>
+        </div>
+        <div class="mission-loc-sm">Santa Fortuna · Colombia</div>
+      </div>
+    </a>
+
+    <!-- Missão 04 — com dados -->
+    <a class="mission-card-sm" href="m4.html">
+      <img class="mission-cover-sm" src="4 Chasing a Ghost/4_Chasing_a_Ghost_Cover.png" alt="Chasing a Ghost" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#4</span>
+          <span class="mission-title-sm">Chasing a Ghost</span>
+        </div>
+        <div class="mission-loc-sm">Mumbai · Maharashtra, India</div>
+      </div>
+    </a>
+
+    <!-- Missão 05 — destaque, com dados -->
+    <a class="mission-card-home" href="m5.html">
+      <div class="red-scan"></div>
+      <img class="mission-cover-home" src="5 Another Life/5_Another_Life_Cover.jpg" alt="Another Life" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-cover-overlay"></div>
+      <div class="prog-ring-wrap">
+        <svg viewBox="0 0 62 62" xmlns="http://www.w3.org/2000/svg">
+          <circle class="prog-ring-bg" cx="31" cy="31" r="26"/>
+          <circle class="prog-ring-fill" id="home-ring" cx="31" cy="31" r="26"/>
+          <text class="prog-ring-pct" id="home-ring-pct" x="31" y="31">—</text>
+        </svg>
+      </div>
+      <div class="mission-info-home">
+        <div class="mission-title-home-line">
+          <span class="mission-num-home">#5</span>
+          <span class="mission-title-home">Another Life</span>
+        </div>
+        <div class="mission-loc-home">Whittleton Creek · Vermont, USA</div>
+      </div>
+    </a>
+
+    <!-- Missão 06 — em breve -->
+    <div class="mission-card-sm" style="cursor:default">
+      <img class="mission-cover-sm" src="6 The Ark Society/6_The_Ark_Society_Cover.png" alt="The Ark Society" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#6</span>
+          <span class="mission-title-sm">The Ark Society</span>
+        </div>
+        <div class="mission-loc-sm">Isle of Sgàil · North Atlantic</div>
+      </div>
+    </div>
+
+    <!-- Missão 07 — em breve -->
+    <div class="mission-card-sm" style="cursor:default">
+      <img class="mission-cover-sm" src="7 Golden Handshake/7_Golden_Handshake_Cover.png" alt="Golden Handshake" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#7</span>
+          <span class="mission-title-sm">Golden Handshake</span>
+        </div>
+        <div class="mission-loc-sm">New York · New York, U.S.A.</div>
+      </div>
+    </div>
+
+    <!-- Missão 08 — em breve -->
+    <div class="mission-card-sm" style="cursor:default">
+      <img class="mission-cover-sm" src="8 The Last Resort/8_The_Last_Resort_Cover.png" alt="The Last Resort" onerror="this.style.background='#1a1a1a'"/>
+      <div class="mission-overlay-sm"></div>
+      <div class="mission-soon-badge">Em breve</div>
+      <div class="mission-info-sm">
+        <div class="mission-title-line">
+          <span class="mission-num-sm">#8</span>
+          <span class="mission-title-sm">The Last Resort</span>
+        </div>
+        <div class="mission-loc-sm">Haven Island · Maldives</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── GITHUB SYNC MODAL ── -->
+<div class="modal-bg" id="sync-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Sincronização</div>
+    <p class="modal-sub">
+      O progresso é salvo em <strong style="color:var(--text-muted)">progress.json</strong> no seu repositório do GitHub.<br><br>
+      Gere um token em <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens</a> com permissão <strong>repo</strong> (ou <strong>public_repo</strong> se o repositório for público).
+    </p>
+    <label class="modal-label" for="token-input">Personal Access Token</label>
+    <input class="modal-input" id="token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false"/>
+    <div class="modal-row">
+      <button class="modal-btn modal-btn-save" onclick="saveToken()">Salvar e Conectar</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
+    <div class="modal-status" id="modal-status"></div>
+    <div class="modal-divider"></div>
+    <button class="modal-danger" onclick="disconnectGitHub()">Desconectar e apagar token</button>
+  </div>
+</div>
+
+<!-- ── SYNC INDICATOR ── -->
+<div class="sync-indicator" id="sync-indicator" onclick="openModal()" title="Sincronização com GitHub">
+  <div class="sync-dot off" id="sync-dot"></div>
+  <span class="sync-lbl" id="sync-lbl">GitHub</span>
+</div>
+
+<script>
+// ── ESTATÍSTICAS GLOBAIS ──
+// Lê o progresso salvo de cada missão diretamente do localStorage
+// e exibe a soma total nos 4 contadores da página inicial.
+function updateHomeStats() {
+  // Definição de cada missão:
+  // key         → chave no localStorage
+  // cats        → categorias salvas nessa chave
+  // Os valores são arrays de IDs marcados como concluídos.
+  const MISSIONS = [
+    { key: 'hitman_m1_v1', cats: ['intelligence', 'challenges', 'disguises'] },
+    { key: 'hitman_m2_v1', cats: ['stories', 'intelligence', 'challenges', 'disguises'] },
+    { key: 'hitman_m3_v1', cats: ['stories', 'intelligence', 'challenges', 'disguises'] },
+    { key: 'hitman_m4_v1', cats: ['stories', 'intelligence', 'challenges', 'disguises'] },
+    { key: 'hitman_al_v2', cats: ['stories', 'intelligence', 'challenges', 'disguises'], fallback: 'hitman_another_life' },
+  ];
+
+  let totals = { stories: 0, intelligence: 0, challenges: 0, disguises: 0 };
+
+  MISSIONS.forEach(({ key, cats, fallback }) => {
+    try {
+      const raw = localStorage.getItem(key) || (fallback ? localStorage.getItem(fallback) : null);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      cats.forEach(cat => {
+        const arr = saved[cat];
+        if (Array.isArray(arr)) totals[cat] += arr.length;
+      });
+    } catch(e) {}
+  });
+
+  const el = (id) => document.getElementById(id);
+  el('hs-stories').textContent    = totals.stories    || '0';
+  el('hs-intel').textContent      = totals.intelligence || '0';
+  el('hs-challenges').textContent = totals.challenges  || '0';
+  el('hs-disguises').textContent  = totals.disguises   || '0';
+}
+
+// Atualiza ao carregar a página
+updateHomeStats();
+
+// Atualiza quando o usuário volta de outra aba/página (ex: volta de m1.html)
+window.addEventListener('focus', updateHomeStats);
+
+// ── GITHUB SYNC (index) ──
+const GH = {
+  owner: 'fidelgalo',
+  repo:  'Hitman-App-Companion',
+  file:  'progress.json',
+  branch:'main',
+  get token() { return localStorage.getItem('gh_pat') || ''; },
+  get api()   { return `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.file}`; }
+};
+
+function setSyncState(s, lbl) {
+  const dot = document.getElementById('sync-dot');
+  const lb  = document.getElementById('sync-lbl');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + s;
+  if (lb && lbl) lb.textContent = lbl;
+}
+function openModal() {
+  const modal = document.getElementById('sync-modal');
+  modal.classList.add('open');
+  if (!modal._listenerAdded) {
+    modal.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    modal._listenerAdded = true;
+  }
+  const inp = document.getElementById('token-input');
+  if (GH.token) inp.value = GH.token;
+  document.getElementById('modal-status').textContent = '';
+  document.getElementById('modal-status').className = 'modal-status';
+}
+function closeModal() {
+  document.getElementById('sync-modal').classList.remove('open');
+}
+function setModalStatus(msg, type) {
+  const el = document.getElementById('modal-status');
+  el.textContent = msg;
+  el.className = 'modal-status' + (type ? ' ' + type : '');
+}
+async function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val) { setModalStatus('Cole um token válido.', 'err'); return; }
+  localStorage.setItem('gh_pat', val);
+  setModalStatus('Verificando...', '');
+  const ok = await testConnection();
+  if (ok) {
+    setModalStatus('Conectado!', 'ok');
+    setTimeout(closeModal, 1400);
+  }
+}
+function disconnectGitHub() {
+  localStorage.removeItem('gh_pat');
+  setSyncState('off', 'GitHub');
+  closeModal();
+}
+async function testConnection() {
+  setSyncState('syncing', 'Conectando...');
+  try {
+    const res = await fetch(GH.api + '?ref=' + GH.branch, {
+      headers: { Authorization: 'token ' + GH.token, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (res.ok || res.status === 404) { setSyncState('ok', 'GitHub'); return true; }
+    throw new Error('HTTP ' + res.status);
+  } catch(e) {
+    setSyncState('err', 'Erro');
+    setModalStatus('Token inválido ou sem permissão no repositório.', 'err');
+    return false;
+  }
+}
+// Inicializar indicador
+if (GH.token) setSyncState('ok', 'GitHub');
+else setSyncState('off', 'GitHub');
+</script>
+
+</body>
+</html>
