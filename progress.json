@@ -2,6 +2,8 @@
   "stories": [],
   "intelligence": [],
   "challenges": [],
-  "disguises": [],
-  "updated_at": "2026-06-02T00:12:48.930Z"
+  "disguises": [
+    "disguise_3"
+  ],
+  "updated_at": "2026-06-02T00:12:51.518Z"
 }
