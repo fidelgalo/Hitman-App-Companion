@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>HITMAN 2 — #2 The Finish Line</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+
+:root {
+  --red: #c8102e;
+  --red-glow: rgba(200,16,46,0.4);
+  --red-dim: rgba(200,16,46,0.15);
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --bg: #0e0e0e;
+  --bg2: #141414;
+  --bg3: #1a1a1a;
+  --bg4: #1f1f1f;
+  --border: #252525;
+  --border-light: #333;
+  --text: #f0f0f0;
+  --text-muted: #b8b8b8;
+  --text-dim: #6a6a6a;
+  --blue: #4a9edd;
+  --blue-dim: rgba(74,158,221,0.15);
+  --green: #4ecb7a;
+  --green-dim: rgba(78,203,122,0.12);
+  --purple: #a87fd4;
+  --purple-dim: rgba(168,127,212,0.12);
+  --orange: #e07b3a;
+  --orange-dim: rgba(224,123,58,0.12);
+  --teal: #4ecfb8;
+  --teal-dim: rgba(78,207,184,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
+
+/* ══ PAGES ══ */
+.page{display:none;animation:fadeIn .35s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ HOME ══ */
+#home{min-height:100vh;position:relative}
+.home-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,16,46,.1) 0%,transparent 65%),var(--bg)
+}
+.home-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 100px}
+
+
+/* Mission card */
+.mission-card-home{
+  position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid var(--border);
+  transition:border-color .3s,transform .2s;
+  animation:slideUp .5s .1s cubic-bezier(.16,1,.3,1) both;
+  margin-top:8px
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mission-card-home:hover{border-color:var(--red);transform:translateY(-2px)}
+.mission-card-home:active{transform:scale(.99)}
+.mission-cover-home{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-home:hover .mission-cover-home{transform:scale(1.03)}
+.mission-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.08) 100%)}
+.red-scan{position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(to right,transparent,var(--red),transparent);animation:scan 3.5s 1s infinite}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.prog-ring-wrap{position:absolute;top:12px;right:12px;width:62px;height:62px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.prog-ring-bg{fill:rgba(40,40,40,.65);stroke:rgba(255,255,255,.12);stroke-width:3}
+.prog-ring-fill{fill:none;stroke:var(--red);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:163.4;stroke-dashoffset:163.4;transform:rotate(-90deg);transform-origin:31px 31px;transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
+.prog-ring-pct{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+.mission-info-home{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.mission-title-home{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-home-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-home{font-size:13px;color:var(--text-muted);letter-spacing:.08em;margin-top:5px}
+
+/* Missions section label */
+.missions-label{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:10px;letter-spacing:.45em;color:var(--text-dim);text-transform:uppercase;margin-top:16px;margin-bottom:0;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Missions grid — 2 columns for other missions */
+.missions-grid-other{display:block}
+.mission-card-sm{position:relative;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s,transform .2s;display:block;width:100%;margin-top:8px}
+.mission-card-sm:hover{border-color:rgba(200,16,46,.5);transform:translateY(-2px)}
+.mission-card-sm:active{transform:scale(.98)}
+.mission-cover-sm{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s;background:var(--bg3)}
+.mission-card-sm:hover .mission-cover-sm{transform:scale(1.04)}
+.mission-overlay-sm{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.15) 60%,transparent 100%)}
+.mission-info-sm{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px}
+.mission-num-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:8px;flex-shrink:0}
+.mission-title-sm{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.mission-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.mission-loc-sm{font-size:13px;color:var(--text-muted);letter-spacing:.07em;margin-top:4px}
+.mission-soon-badge{position:absolute;top:14px;right:14px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;background:rgba(0,0,0,.7);border:1px solid var(--border-light);padding:4px 10px;backdrop-filter:blur(6px)}
+
+.home-banner{display:block;width:100%;aspect-ratio:616/353;object-fit:cover;background:var(--bg3);border:1px solid var(--border);margin-bottom:0}
+/* Stats */
+.home-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--border);border-top:none;background:var(--border);animation:slideUp .5s .2s cubic-bezier(.16,1,.3,1) both;margin-bottom:0}
+.stat-box{background:#222;padding:12px 8px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.stat-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:3px}
+
+
+/* ══ MISSION PAGE ══ */
+#mission{min-height:100vh;background:var(--bg)}
+
+/* Hero */
+.hero{position:relative;height:56vw;min-height:210px;max-height:360px;overflow:hidden}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 55%,var(--bg) 100%)}
+.hero-top{position:absolute;top:0;left:0;right:0;padding:max(env(safe-area-inset-top),12px) 16px 12px;display:flex;align-items:center}
+.back-btn{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);padding:8px 14px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase;backdrop-filter:blur(8px);transition:all .2s}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 16px 18px}
+.hero-title-line{display:flex;align-items:baseline;gap:0;flex-wrap:nowrap}
+.hero-num{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:var(--red);text-transform:uppercase;line-height:1;margin-right:10px;flex-shrink:0}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.hero-loc{font-size:13px;color:var(--text-muted);letter-spacing:.1em;margin-top:6px}
+
+/* Brief */
+.brief-strip{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.brief-text{font-size:13.5px;line-height:1.7;color:var(--text-muted);text-align:justify;text-align-last:left}
+.targets-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.targets-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--text-dim);text-transform:uppercase}
+.chip-pair{display:flex;align-items:center;gap:8px}
+.chip-icon{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.target-chip{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 14px 5px;text-transform:uppercase;background:rgba(200,16,46,.85);border:1px solid rgba(200,16,46,.9);color:#fff;display:flex;flex-direction:column;gap:0}
+.target-chip-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1;margin-bottom:3px}
+.target-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+.obj-chip{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;padding:6px 14px 5px;text-transform:uppercase;background:rgba(74,158,221,.75);border:1px solid rgba(74,158,221,.9);color:#fff;display:flex;flex-direction:column;gap:0}
+.obj-chip-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:rgba(255,255,255,.7);text-transform:uppercase;line-height:1;margin-bottom:3px}
+.obj-chip-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;color:#fff;text-transform:uppercase;line-height:1}
+
+/* Overall prog */
+.overall-prog{padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.overall-prog-inner{display:flex;align-items:center;justify-content:space-between;padding:9px 0 3px}
+.overall-prog-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase}
+.overall-prog-val{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--red)}
+.prog-track{height:6px;background:rgba(255,255,255,.07);margin-bottom:10px;border-radius:1px}
+.prog-fill{height:100%;background:var(--red);transition:width .8s cubic-bezier(.16,1,.3,1);width:0%;border-radius:1px}
+
+/* Content */
+.mission-content{max-width:700px;margin:0 auto;padding:0 0 80px}
+
+/* Section */
+.section-block{border-bottom:1px solid var(--border)}
+.section-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;background:#0a0a0a;transition:background .15s}
+.section-header:active{background:#111}
+.sec-header-text{flex:1;min-width:0}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:.12em;color:#fff;text-transform:uppercase;line-height:1}
+.sec-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-top:1px}
+.sec-prog{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text-muted);flex-shrink:0;white-space:nowrap}
+.sec-prog span{color:var(--red)}
+.sec-chevron{color:var(--text-dim);font-size:11px;flex-shrink:0;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.section-header.open .sec-chevron{transform:rotate(180deg)}
+.sec-prog-track{height:1px;background:rgba(255,255,255,.04)}
+.sec-prog-fill{height:100%;transition:width .6s cubic-bezier(.16,1,.3,1);width:0%}
+.sec-prog-fill-stories{background:var(--red)}
+.sec-prog-fill-intel{background:var(--red)}
+.sec-prog-fill-challenges{background:var(--red)}
+.sec-prog-fill-disguises{background:var(--red)}
+.section-body{display:none}
+.section-body.open{display:block;animation:bodyOpen .25s cubic-bezier(.16,1,.3,1)}
+@keyframes bodyOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STORIES ── */
+.story-item{display:grid;grid-template-columns:110px 1fr;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s;position:relative;overflow:hidden}
+.story-item.completed{opacity:.38}
+.story-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--red);transform:scaleY(0);transform-origin:top;transition:transform .2s}
+.story-item:hover::before{transform:scaleY(1)}
+.story-thumb-wrap{position:relative;width:110px;flex-shrink:0}
+.story-thumb{width:110px;height:100%;min-height:90px;object-fit:cover;display:block;background:var(--bg3)}
+.story-check-overlay{position:absolute;top:7px;left:7px;z-index:2}
+.story-body{padding:12px 14px;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.story-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.1}
+.story-subtitle-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.3em;color:var(--red);text-transform:uppercase;margin-top:3px}
+.story-desc{font-size:11.5px;line-height:1.55;color:#fff;margin-top:6px;text-align:justify;text-align-last:left}
+
+/* ── INTELLIGENCE ── */
+.intel-search-wrap{padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.intel-search{flex:1;background:transparent;border:none;outline:none;font-family:'Barlow',sans-serif;font-size:14px;color:var(--text);padding:4px 0}
+.intel-search::placeholder{color:var(--text-dim)}
+.intel-search-icon{color:var(--text-dim);font-size:13px;flex-shrink:0}
+
+.intel-item{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);background:var(--bg);transition:background .15s}
+.intel-item.completed{opacity:.38}
+.intel-check{display:flex;align-items:flex-start;justify-content:center;padding:16px 12px 16px 16px;flex-shrink:0;padding-top:17px}
+.intel-body{padding:13px 16px 13px 0;min-width:0;flex:1}
+.intel-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;color:var(--gold-light);text-transform:uppercase;line-height:1.15}
+.intel-desc{font-size:12px;line-height:1.6;color:#fff;margin-top:3px;text-align:justify;text-align-last:left}
+
+/* ── CHALLENGES ── */
+.challenge-filters{display:flex;gap:5px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg3)}
+.challenge-filters::-webkit-scrollbar{display:none}
+.cf-btn{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;padding:5px 12px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;text-transform:uppercase;transition:all .15s;white-space:nowrap}
+.cf-btn.active,.cf-btn:hover{border-color:var(--red);color:#fff;background:var(--red-dim)}
+
+.challenge-card{border-bottom:1px solid var(--border);background:var(--bg);overflow:hidden}
+.challenge-card.completed .challenge-head{opacity:.35}
+.challenge-card.completed .challenge-body-content{opacity:.35}
+.challenge-head{display:grid;grid-template-columns:56px 1fr auto auto;align-items:center;cursor:pointer;transition:background .15s;min-height:58px}
+.challenge-head:active{background:var(--bg3)}
+.challenge-thumb-wrap{width:56px;height:56px;overflow:hidden;flex-shrink:0;background:var(--bg3)}
+.challenge-thumb{width:56px;height:56px;object-fit:cover;display:block}
+.challenge-head-body{padding:9px 8px 9px 13px;min-width:0}
+.challenge-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase;line-height:1.15;display:flex;align-items:flex-start;gap:6px}
+.challenge-type-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.challenge-xp{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;color:var(--gold);margin-top:2px}
+.challenge-check-col{padding:8px 8px;display:flex;align-items:center;flex-shrink:0}
+.challenge-expand-col{padding:8px 13px 8px 0;display:flex;align-items:center;flex-shrink:0;color:var(--text-dim);font-size:11px;transition:transform .3s}
+.challenge-card.expanded .challenge-expand-col{transform:rotate(180deg)}
+.challenge-body-content{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.challenge-card.expanded .challenge-body-content{display:block;animation:bodyOpen .2s ease}
+.challenge-desc-text{font-size:13px;line-height:1.65;color:#fff;margin-top:12px;white-space:pre-line;text-align:justify;text-align-last:left}
+.challenge-reward-row{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.reward-img{width:72px;height:72px;object-fit:cover;border:1px solid var(--gold);background:var(--bg3);flex-shrink:0}
+.reward-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.reward-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;color:var(--gold-light);text-transform:uppercase}
+
+.dot-A{background:var(--red)}
+.dot-D{background:var(--blue)}
+.dot-F{background:#ffffff}
+.dot-T{background:var(--purple)}
+.dot-TC{background:var(--teal)}
+.dot-CN{background:var(--orange)}
+
+/* ── DISGUISES ── */
+.disguises-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:1px;background:var(--border)}
+.disguise-card{background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;gap:8px;transition:background .15s;position:relative}
+.disguise-card.completed .disguise-img{filter:grayscale(1) brightness(.45)}
+.disguise-card.completed .disguise-name{color:var(--text-dim)}
+.disguise-img-wrap{position:relative;width:86px;height:86px}
+.disguise-img{width:86px;height:86px;object-fit:cover;object-position:top center;display:block;border:1px solid var(--border);background:var(--bg3)}
+.disguise-done-overlay{display:none;position:absolute;inset:0;background:rgba(200,16,46,.35);align-items:center;justify-content:center;font-size:20px}
+.disguise-card.completed .disguise-done-overlay{display:flex}
+.disguise-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase;text-align:center;line-height:1.2}
+.disguise-check-pos{position:absolute;top:7px;right:7px}
+
+/* ── CHECKBOX ── */
+.custom-check{width:20px;height:20px;border:1.5px solid var(--border-light);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.custom-check:hover{border-color:var(--red);background:rgba(200,16,46,.1)}
+.custom-check.checked{border-color:var(--red);background:var(--red)}
+.custom-check.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+/* Checkbox sobre imagem — fundo cinza quando não selecionado */
+.story-check-overlay .custom-check,
+.disguise-check-pos .custom-check{background:rgba(30,30,30,.72);border-color:rgba(180,180,180,.5)}
+.story-check-overlay .custom-check:hover,
+.disguise-check-pos .custom-check:hover{background:rgba(200,16,46,.25);border-color:var(--red)}
+.story-check-overlay .custom-check.checked,
+.disguise-check-pos .custom-check.checked{background:var(--red);border-color:var(--red)}
+
+
+/* ── GITHUB SYNC ── */
+.sync-indicator{position:fixed;bottom:22px;left:18px;display:flex;align-items:center;gap:8px;z-index:200;cursor:pointer}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);transition:background .3s;flex-shrink:0}
+.sync-dot.syncing{background:var(--gold);animation:pulse .8s infinite}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.err{background:var(--red)}
+.sync-dot.off{background:var(--text-dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;transition:color .3s}
+.sync-indicator:hover .sync-lbl{color:var(--text-muted)}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--bg3);border:1px solid var(--border-light);max-width:440px;width:100%;padding:28px;position:relative}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:.15em;color:var(--gold-light);text-transform:uppercase;margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.modal-sub a{color:var(--blue);text-decoration:none}
+.modal-sub a:hover{text-decoration:underline}
+.modal-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg2);border:1px solid var(--border-light);color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;margin-bottom:16px}
+.modal-input:focus{border-color:var(--red)}
+.modal-input::placeholder{color:var(--text-dim)}
+.modal-row{display:flex;gap:8px}
+.modal-btn{flex:1;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;border:none;cursor:pointer;transition:background .15s}
+.modal-btn-save{background:var(--red);color:#fff}
+.modal-btn-save:hover{background:#e01535}
+.modal-btn-cancel{background:var(--border-light);color:var(--text-muted)}
+.modal-btn-cancel:hover{background:var(--border)}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-status{font-size:12px;margin-top:12px;min-height:16px;color:var(--text-dim)}
+.modal-status.ok{color:var(--green)}
+.modal-status.err{color:#ff7a8a}
+.modal-divider{height:1px;background:var(--border);margin:18px 0}
+.modal-danger{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--red);text-transform:uppercase;cursor:pointer;background:none;border:none;padding:0}
+.modal-danger:hover{text-decoration:underline}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:22px;right:18px;width:44px;height:44px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;transform:translateY(10px);box-shadow:0 4px 18px rgba(200,16,46,.35)}
+.fab.visible{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:36px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase}
+
+/* ══ RESPONSIVE ══ */
+@media(min-width:480px){
+  .story-item{grid-template-columns:134px 1fr}
+  .story-thumb{width:134px}
+  .challenge-head{grid-template-columns:70px 1fr auto auto}
+  .challenge-thumb-wrap{width:70px;height:70px}
+  .challenge-thumb{width:70px;height:70px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:102px;height:102px}
+}
+@media(min-width:640px){
+  .story-item{grid-template-columns:158px 1fr}
+  .story-thumb{width:158px}
+  .disguises-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+  .disguise-img-wrap,.disguise-img{width:116px;height:116px}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ MISSÃO 02: THE FINISH LINE ═══ -->
+<div id="mission-2">
+  <div class="hero">
+    <img class="hero-img" src="2 The Finish Line/2_The_Finish_Line_Cover.png" alt="The Finish Line" onerror="this.style.background='#1a1a1a'"/>
+    <div class="hero-overlay"></div>
+    <div class="hero-top">
+      <a class="back-btn" href="index.html">← Voltar</a>
+    </div>
+    <div class="hero-content">
+      <div class="hero-title-line">
+        <span class="hero-num">#2</span>
+        <span class="hero-title">The Finish Line</span>
+      </div>
+      <div class="hero-loc">Miami · Florida, U.S.A.</div>
+    </div>
+  </div>
+
+  <div class="brief-strip">
+    <div class="targets-row">
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Sierra Knox</span>
+        </div>
+      </div>
+      <div class="chip-pair">
+        <img class="chip-icon" src="Icons/Icon-Target.png" alt="Target"/>
+        <div class="target-chip">
+          <span class="target-chip-label">Target</span>
+          <span class="target-chip-name">Robert Knox</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overall-prog">
+    <div class="overall-prog-inner">
+      <span class="overall-prog-lbl">Progresso Geral</span>
+      <span class="overall-prog-val" id="m2-overall-pct-lbl">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="m2-overall-prog-fill"></div></div>
+  </div>
+
+  <div class="mission-content">
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m2-body-stories')">
+        <div class="sec-header-text"><div class="sec-title">Mission Stories</div></div>
+        <div class="sec-prog" id="m2-prog-stories"><span>0</span> / 7</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-stories" id="m2-pf-stories"></div></div>
+      <div class="section-body open" id="m2-body-stories">
+        <div id="m2-stories-container"></div>
+      </div>
+    </div>
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m2-body-intel')">
+        <div class="sec-header-text"><div class="sec-title">Intelligence</div></div>
+        <div class="sec-prog" id="m2-prog-intel"><span>0</span> / 44</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-intel" id="m2-pf-intel"></div></div>
+      <div class="section-body open" id="m2-body-intel">
+        <div class="intel-search-wrap">
+          <span class="intel-search-icon">🔎</span>
+          <input class="intel-search" type="text" placeholder="Buscar inteligência..." oninput="filterIntelM2(this.value)" autocomplete="off"/>
+        </div>
+        <div id="m2-intel-container"></div>
+      </div>
+    </div>
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m2-body-challenges')">
+        <div class="sec-header-text"><div class="sec-title">Challenges</div></div>
+        <div class="sec-prog" id="m2-prog-challenges"><span>0</span> / 77</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-challenges" id="m2-pf-challenges"></div></div>
+      <div class="section-body open" id="m2-body-challenges">
+        <div class="challenge-filters">
+          <button class="cf-btn active" onclick="filterChallengesM2(this,'')">Todos</button>
+          <button class="cf-btn" onclick="filterChallengesM2(this,'A')">Assassinato</button>
+          <button class="cf-btn" onclick="filterChallengesM2(this,'D')">Descoberta</button>
+          <button class="cf-btn" onclick="filterChallengesM2(this,'F')">Feito</button>
+          <button class="cf-btn" onclick="filterChallengesM2(this,'T')">Target</button>
+          <button class="cf-btn" onclick="filterChallengesM2(this,'TC')">Clássico</button>
+        </div>
+        <div id="m2-challenges-container"></div>
+      </div>
+    </div>
+    <div class="section-block">
+      <div class="section-header open" onclick="toggleSec(this,'m2-body-disguises')">
+        <div class="sec-header-text"><div class="sec-title">Disguises</div></div>
+        <div class="sec-prog" id="m2-prog-disguises"><span>0</span> / 30</div>
+        <div class="sec-chevron">▼</div>
+      </div>
+      <div class="sec-prog-track"><div class="sec-prog-fill sec-prog-fill-disguises" id="m2-pf-disguises"></div></div>
+      <div class="section-body open" id="m2-body-disguises">
+        <div class="disguises-grid" id="m2-disguises-container"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ── SECTION TOGGLE ──
+function toggleSec(headerEl, bodyId) {
+  const body = document.getElementById(bodyId);
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  headerEl.classList.toggle('open', !open);
+}
+
+// ── SCROLL FAB ──
+window.addEventListener('scroll', () => {
+  const f = document.getElementById('fab');
+  f.classList.toggle('visible', window.scrollY > 250);
+}, {passive:true});
+</script>
+
+<script>
+const DATA_M2 = {
+  stories: [
+    { title:'The Munchies',      subtitle:"Robert Knox's favorite street food vendor has a stand at the race. Sounds promising.",                              desc:"It seems Robert Knox paid several visits to a bayside area food stand yesterday. The vendor, known as Florida Man, sells extremely addictive food so we should expect Knox to return. Maybe this is a way to catch Robert Knox away from the office?",                                                                                                                              img:'2 The Finish Line/Stories/STORIES_The_Munchies_Tile.png' },
+    { title:'A Perfect Machine', subtitle:'A spot on the Kronstadt pit crew. Sounds like an invitation to mischief.',                                         desc:"One of the Kronstadt pit crew has unexpectedly quit the team in protest and Grace Miller, the ball-buster chief mechanic, is in critical need of a replacement. Why don't you step in and offer your services, 47? You're good with a wrench.",                                                                                                                              img:'2 The Finish Line/Stories/STORIES_A_Perfect_Machine_Tile.png' },
+    { title:'The Triumph',       subtitle:'The victory podium is rigged to a pyrotechnics display. Sounds promising.',                                        desc:"Maxwell Rutter, the race Chief Coordinator, is worried that the powerful new pyrotechnics system connected to the victory podium is not exactly tamper-proof. Sabotaging it could have devastation consequences. Well, what are you waiting for?",                                                                                                                            img:'2 The Finish Line/Stories/STORIES_The_Triumph_Tile.png' },
+    { title:'Intravenous',       subtitle:'Sierra Knox is due for an intravenous revitalization treatment at the emergency area. Interesting, 47.',           desc:"So, it seems Sierra Knox has jumped on the revitalization bandwagon and is scheduled for an injection of some sort. The doctor who is supposed to help her with the procedure is preoccupied with a patient who is unable to urinate. Curious situation, 47. Maybe you can speed things up?",                                                                                  img:'2 The Finish Line/Stories/STORIES_Intravenous_Tile.png' },
+    { title:'Turbo Charged',     subtitle:'A prototype Kronstadt race car. If anything happens to it, Knox will likely come running.',                        desc:"Robert Knox has a race car on display in the expo building. The show staff is under strict institutions to summon him at any sign of malfunction. Apparently, Knox trusts no one to fix his car but him. Hm, perhaps it's time to poke around under the hood, 47. They do say one should never mess with another man's wheels....",                                         img:'2 The Finish Line/Stories/STORIES_Turbo_Charged_Tile.png' },
+    { title:'Pretty in Pink',    subtitle:'A blackmailer in a pink flamingo outfit. Sierra Knox keeps some colorful enemies.',                                 desc:"A disgruntled Kronstadt employee has acquired some dirt on Sierra Knox and intends on blackmailing her. Disguised as one of the racing mascots, he plans to meet Sierra by the old motel. Well, I always did feel that pink was your color, 47.",                                                                                                                            img:'2 The Finish Line/Stories/STORIES_Pretty_In_Pink_Tile.png' },
+    { title:'The New Army',      subtitle:'Robert Knox, a military contractor, and a new robotics project.',                                                  desc:"Ted Mendez, a defence funding consultant with the US military, is scheduled for a private demonstration of a new Kronstadt project. Sounds like a way to get up close and personal with Robert Knox.",                                                                                                                                                                    img:'2 The Finish Line/Stories/STORIES_The_New_Army_Tile.png' },
+  ],
+  intelligence: [
+    { title:'A Simple Note Signed by "RK"',      desc:'"To the mechanic. The race is over. You failed to live up to your end of the agreement. You will never work in this town again. RK."' },
+    { title:'A Spanner in the Gears',            desc:'"One of the Kronstadt mechanics had left the team after an argument with Grace Miller, head of Kronstadt mechanics. The constant supervision by Robert Knox has finally gotten to him and the team is now one mechanic short."' },
+    { title:'Chili Sauce',                       desc:"\"Sierra Knox's drinking contest involves the spiking of shots with chili sauce. Who knows what else one could add?\"" },
+    { title:'Derek McInnis ID Card',             desc:'"Identification papers belonging to one Derek McInnis. The picture makes him look like a cartoony scientist."' },
+    { title:"Doctor's Schedule",                 desc:"\"Doctor's schedule showing us that Sierra Knox's revitalization procedure is scheduled after Thierry Durand. It looks like they're running late for some reason.\"" },
+    { title:'Electronic Access Dongle',          desc:'"A security dongle likely used to access a piece of electronic equipment in the Bayside Center building. The type looks to match a satellite dish or similar item."' },
+    { title:'Electronic Car Key',                desc:'"An electronic car key. Looks rather old."' },
+    { title:'Event Area Key',                    desc:'"A key that grants access to the backstage areas of the event."' },
+    { title:'Evidence Locker Combination',       desc:'"A combination code for the race security evidence locker."' },
+    { title:'Florida Man Article',               desc:"\"Newspaper article with a picture of the food vendor known as 'Florida Man'. The article details how the food vendor has overcome one fantastic set of obstacles after the other in his pursuit of happiness. From nude wrestling with alligators to spending time in jail for spiking his food with crystal meth - a charge he was later cleared of, 'Florida Man' has apparently seen it all. He has now struck success with his new job as a food vendor and even quotes robotics tycoon Robert Knox as saying his coconut balls are 'simply the best'.\"" },
+    { title:'Food Vendor Key',                   desc:"\"A key. Grants access to the Florida Man's food stand.\"" },
+    { title:'Global Innovation Race Flyer',      desc:'"The Global Innovation Race is a major sporting event taking place in Miami every year. Besides the endurance race itself, which runs over the course of two days, the social aspect of the race has exploded over the years. Growing from being mostly an enthusiast event, it is now a major public event complete with exclusive areas for VIPs and separate paddocks for the team drivers and crew to relax while not on track or in the pits. The exclusive driver\'s lounge features nightly parties and often sees the attendance of various celebrities."' },
+    { title:'Incriminating Evidence',            desc:"\"A pile of incriminating evidence, presumably to be used by either a journalist or a blackmailer, indicating that Sierra Knox is performing a cover-up of something called 'The Tungan Valley Incident'.\"" },
+    { title:'Knox the Mechanic',                 desc:'"Robert Knox has a prototype of his RK Mark III racing car on display in the Kronstadt Bayside Center. He is so concerned about it that he has ordered the engineers in the expo building to get him immediately should anything happen to the car. It\'s likely he will come rushing down to fix it himself."' },
+    { title:'Knox vs. Lee',                      desc:'"Sierra Knox has a tradition of challenging her rival Moses Lee to a drinking game after the race is done. This year is no different and everything has been set up in the VIP lounge."' },
+    { title:'Kronstadt Bayside Center Keycard',  desc:'"A keycard. Grants access to restricted areas of the Kronstadt Bayside Center building."' },
+    { title:'Kronstadt Pit Argument',            desc:'"Grace Miller, the chief Kronstadt mechanic, was seen arguing with one of the regular mechanics earlier in the day. That mechanic no longer works for the team but is likely still at the race somewhere."' },
+    { title:'Kronstadt Pit Security Memo',       desc:"\"A memo from Grace Miller, the Kronstadt chief mechanic. It states that rumors of sabotage by other teams have surfaced and she advises everyone to pay close attention to suspicious items in the pit. If anyone notices defects with the wheels or the fuel supply, they should notify her immediately. She also stresses that there is a strict uniform-only policy in the pit and that everyone should keep their tools with them at all times.\"" },
+    { title:'Loading Bay Octane Booster',        desc:"\"Apparently there is a bottle of Kronstad's patented octane booster mixture somewhere in the loading bay area. The booster will drastically enhance racing performance but is not cleared for use in the Global Innovation Race.\"" },
+    { title:"McInnis' Notebook on Robert Knox",  desc:"\"Derek McInnis, chief android engineer at Kronstadt, apparently keeps a series of personal journals. Here, McInnis explores the nature of Robert Knox and details a complex relationship between the two men. The journal is at times rather incoherent, rambling about the genius of Knox while at the same time raging about the decisions he's making from a business perspective. It's clear that McInnis, while he has great admiration for Knox, has a deep hatred towards his boss. Possibly fueled by an inferiority complex and an incident involving Knox 'rescuing' McInnis from the Yakuza while working in Tokyo.\"" },
+    { title:"McInnis' Notebook on Robotics",     desc:"\"Derek McInnis, chief android engineer at Kronstadt, apparently keeps a series of personal journals. In this one, he goes into some detail about his work on PALLAS but keeps digressing into another project, which he has nicknamed 'DOLORES'. Apparently, he's trying to create a companion robot, but Knox wants nothing to do with it. McInnis seems overly affectionate towards his creation and resents Knox for his lack of interest.\"" },
+    { title:'Medical Cabinet Key',               desc:'"A key. Opens the medical cabinets."' },
+    { title:'Moses Lee Polaroid Picture',        desc:'"A signed polaroid picture of Moses Lee. Even without the cowboy hat, he looks suave."' },
+    { title:'Note from Security Locker',         desc:"\"The note is written in simple ROT13 substitution cipher. Decoded, it reads: 'Mechanic, install device on Kowoon car before race ends. Call RK upon completion.' An additional cipher decodes into a phone number.\"" },
+    { title:'Notebook Belonging to Derek McInnis', desc:'"Derek McInnis, chief android engineer at Kronstadt, apparently keeps a series of personal journals. In this one, he explores his own existence in what can only be described as a high school-level philosopher\'s mediocre thinking. Apparently, McInnis is convinced that humans soon will be able to live beyond the flesh and he muses about the state of consciousness and, in particular, sexual activity and the nature of partnership in an all-robot future."' },
+    { title:'Photo of a Flamingo',               desc:'"A polaroid picture of one of the race mascots dressed as a flamingo."' },
+    { title:'Photo of Robert Knox',              desc:'"A headshot of Robert Knox, torn from a magazine cover."' },
+    { title:'Picture of Target Dummy A',         desc:"\"A picture of a target dummy marked with the letter A. A name, 'Hakan', is written in sharpie on the back of the picture itself.\"" },
+    { title:'Picture of Target Dummy B',         desc:"\"A picture of a target dummy marked with the letter B. A name, 'Bjarne', is written in sharpie on the back of the picture itself.\"" },
+    { title:'Picture of Target Dummy C',         desc:"\"A picture of a target dummy marked with the letter C. A name, 'Marta', is written in sharpie on the back of the picture itself.\"" },
+    { title:'Pit Building Keycard',              desc:'"A keycard that grants access to the team pit garages."' },
+    { title:'Podium Club Pass',                  desc:'"This pass gives entrance to the VIP areas of the Global Innovation Race."' },
+    { title:'Podium Pyrotechnics Setup',         desc:'"An elaborate maze of gas pipes run below the winner\'s podium. It looks like one could tamper with it. Using the right tool, it should be possible to turn the pressure on and off on individual gas outlets on stage."' },
+    { title:'Prescription Eye Drops',           desc:'"Robert Knox has a bottle of prescription eye drops sitting in his office bathroom. The drops are used to alleviate chronic dry eye syndrome, likely a problem he obtained after suffering severe facial burns in a racing accident years ago."' },
+    { title:'Race Computer Security Dongle',     desc:'"It looks like the type of dongle that is used to gain access to a locked computer somewhere."' },
+    { title:'Robert Knox the Foodie',            desc:'"Robert Knox has taken a shine to the snacks served by one of the food vendors down by the water. Apparently, the food is to die for."' },
+    { title:"Robert Knox's Meeting",             desc:"\"Robert Knox has a meeting with Ted Mendez, a military contractor. This is likely related to Kronstadt's new robots project called 'PALLAS'.\"" },
+    { title:'Sierra Knox Check Up',              desc:"\"Sierra Knox has a doctor's appointment after the race. She's expected at the race medical pavillion where she is supposed to get an intravenous vitamin revitalization procedure. However, the attending doctor is occupied with another patient, waiting for him to deliver a urine sample.\"" },
+    { title:'Sierra Knox Magazine',              desc:'"A magazine cover featuring Sierra Knox."' },
+    { title:"Sierra Knox's Private Meeting",     desc:'"Sierra Knox has a private meeting with a blackmailer dressed as one of the race mascots."' },
+    { title:'Speedboat Key',                     desc:'"A key for what is sure to be a very beautiful speed boat."' },
+    { title:'Ted Mendez Picture ID',             desc:"\"Identification papers belonging to a Ted Mendez. Judging by the picture, he's a military man.\"" },
+    { title:'VIP Tickets',                       desc:"\"There's a scalper selling tickets for the VIP areas of the race. It would be a way to get into the exclusive areas of the public part of the event.\"" },
+    { title:'Winner Takes It All',               desc:'"A very flammable pyrotechnics display is being incorporated into the award celebrations of the race. The winner will take the stage and a flame display will be activated. The setup isn\'t entirely tamper-proof, however."' },
+  ],
+  challenges: [
+    { name:'Wheel of Misfortune',               type:'A',  desc:'Assassinate Sierra Knox by sabotaging her tires at the pit stop.',                                                                                                xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Wheel_of_Misfortune.png' },
+    { name:'The Man and the Sea',               type:'A',  desc:'Assassinate Robert Knox with the fish trophy.',                                                                                                                   xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Man_and_the_Sea.png' },
+    { name:"Don't Drive and Drink",             type:'A',  desc:'Assassinate Sierra Knox by putting lethal poison in the trophy.',                                                                                                 xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Don27t_Drive_and_Drink.png' },
+    { name:'Vitamin Overdose',                  type:'A',  desc:'Make the medic assassinate Sierra Knox.',                                                                                                                         xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Vitamin_Overdose.png' },
+    { name:'The Tree Falls on the Apple',       type:'A',  desc:'Assassinate Robert and Sierra Knox with one well-timed push.',                                                                                                    xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Tree_Falls_on_the_Apple.png' },
+    { name:'Paranoid Android',                  type:'A',  desc:'Assassinate Robert Knox using the android.',                                                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Paranoid_Android.png' },
+    { name:'Days of Thunder',                   type:'A',  desc:'Assassinate Sierra Knox by blowing her car up during the race.',                                                                                                  xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Days_of_Thunder.png' },
+    { name:'Ocular Administration',             type:'A',  desc:'Assassinate Robert Knox by poisoning his eye drops.',                                                                                                             xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Ocular_Administration.png' },
+    { name:'Hot Shot',                          type:'A',  desc:'[REDACTED]',                                                                                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Hot_Shot.png' },
+    { name:'Explosive Liaisons',                type:'A',  desc:'[REDACTED]',                                                                                                                                                      xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Explosive_Liaisons.png' },
+    { name:'Better Burn Up than Fade Away',     type:'A',  desc:'Assassinate Sierra using the podium pyrotechnics.',                                                                                                               xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Better_Burn_Up_than_Fade_Away.png' },
+    { name:'Moving Target',                     type:'A',  desc:'Assassinate Sierra by sniping her car during the race.',                                                                                                          xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Moving_Target.png' },
+    { name:'Under the Sea',                     type:'A',  desc:'Assassinate Robert Knox with the shark in the aquarium.',                                                                                                         xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Under_the_Sea.png' },
+    { name:'The Message',                       type:'A',  desc:"Don't push Robert, because he's close to the edge. He might lose his head.",                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Message.png' },
+    { name:'Pink Menace',                       type:'A',  desc:'Assassinate Sierra Knox by pushing her down the elevator shaft during the blackmail meeting, disguised as the Blackmailer.',                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Pink_Menace.png' },
+    { name:'The Florida Diet',                  type:'A',  desc:"Assassinate Robert Knox by serving him poisoned food at the Florida Man's food stand.",                                                                           xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Florida_Diet.png' },
+    { name:'External Combustion Engine',        type:'A',  desc:'Assassinate Robert Knox with an explosion from the Kronstadt demo vehicle.',                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/External_Combustion_Engine.png' },
+    { name:'Doctor 47',                         type:'A',  desc:'Assassinate Sierra Knox by poisoning the IV drip, disguised as a Medic.',                                                                                        xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Doctor_47.png' },
+    { name:'Tasteless, Traceless',              type:'A',  desc:'Assassinate a target with lethal poison.',                                                                                                                        xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Tasteless_H3.png' },
+    { name:'Shafted',                           type:'A',  desc:'[REDACTED]',                                                                                                                                                      xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Shafted.png' },
+    { name:'Someone Could Hurt Themselves',     type:'A',  desc:'Assassinate a target in an accident.',                                                                                                                            xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Someone_could_Hurt.png' },
+    { name:'Hold My Hair',                      type:'A',  desc:'Assassinate a target by drowning them.',                                                                                                                          xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Hold_my_hair.png' },
+    { name:'Straight Shot',                     type:'A',  desc:'Assassinate a target with a headshot.',                                                                                                                           xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Straight_shot_H3.png' },
+    { name:'Piano Man',                         type:'A',  desc:'Assassinate a target with the fiber wire.',                                                                                                                       xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Piano_Man_H3.png' },
+    { name:'Versatile Assassin',                type:'A',  desc:"Complete all the Versatile challenges in Miami:\nPiano Man\nSomeone Could Hurt Themselves\nHold My Hair\nStraight Shot\nTasteless, Traceless",                   xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Versatile_H3.png' },
+    { name:'Bigger Fish',                       type:'A',  desc:'Eliminate Florida Man with the bigger fish.',                                                                                                                     xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Bigger_Fish_Challenge.png' },
+    { name:'Fish Slapping Dance',               type:'A',  desc:'Slap someone into the ocean with a fish.',                                                                                                                        xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Fish_Slapping_Dance.png' },
+    { name:'Shredding the Evidence',            type:'A',  desc:'Eliminate a target with the wood chipper.',                                                                                                                       xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Shredding_the_Evidence_Challenge.png' },
+    { name:'Thorough Demonstration',            type:'A',  desc:'Make the Android eliminate someone other than Robert Knox.',                                                                                                       xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Thorough_Demonstration.png' },
+    { name:'Blackmail',                         type:'D',  desc:'Find the blackmail documents.',                                                                                                                                   xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Blackmail.png' },
+    { name:'The Sewer Beyond',                  type:'D',  desc:'Exfiltrate through the sewers.',                                                                                                                                  xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Sewer_Beyond.png' },
+    { name:'Very Important Person',             type:'D',  desc:'Get a VIP pass.',                                                                                                                                                 xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Very_Important_Person.png' },
+    { name:'One Kilo Brick',                    type:'D',  desc:'Get a brick of cocaine.',                                                                                                                                         xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/One_Kilo_Brick.png' },
+    { name:'You Got a Fast Car',                type:'D',  desc:'[REDACTED]',                                                                                                                                                      xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/You_Got_a_Fast_Car.png' },
+    { name:'Chameleon',                         type:'D',  desc:'Find and equip all disguises in Miami.',                                                                                                                          xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Chameleon_H3.png' },
+    { name:'Day at the Aquarium',               type:'D',  desc:'Find the Kronstadt Bayside Center keycard.',                                                                                                                      xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Day_at_the_Aquarium.png' },
+    { name:'The Military Man',                  type:'D',  desc:'Disguise yourself as Ted Mendez.',                                                                                                                                xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Military_Man.png' },
+    { name:'Frutti di Mare',                    type:'D',  desc:'Find all aquatic weapons in Miami.',                                                                                                                              xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Frutti_di_Mare.png' },
+    { name:'Tintamarresque',                    type:'D',  desc:'[REDACTED]',                                                                                                                                                      xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Tintamarresque.png' },
+    { name:'The Rival',                         type:'D',  desc:'Disguise yourself as Moses Lee.',                                                                                                                                 xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Rival.png' },
+    { name:'Backdoor Engineering',              type:'D',  desc:'Get the event crew key.',                                                                                                                                         xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Backdoor_Engineering.png' },
+    { name:'Free Fishie',                       type:'D',  desc:'Release a fish back into the ocean.',                                                                                                                             xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Free_Fishie.png' },
+    { name:'Slice of Vice',                     type:'D',  desc:'Sail away on the speedboat.',                                                                                                                                     xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Slice_of_Vice.png' },
+    { name:'Sheikh Zanzibar, I Presume?',       type:'D',  desc:'Disguise yourself as the Sheikh.',                                                                                                                                xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Sheikh_Zanzibar3F.png' },
+    { name:'The Flamingo',                      type:'D',  desc:'Disguise yourself as the Mascot.',                                                                                                                                xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Flamingo.png' },
+    { name:"What's In This Thing",              type:'D',  desc:'Open the evidence locker.',                                                                                                                                       xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/What27s_In_This_Thing.png' },
+    { name:'Mr. Tambourine Man',                type:'D',  desc:'[REDACTED]',                                                                                                                                                      xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Mr._Tambourine_Man.png' },
+    { name:'Discover Miami',                    type:'D',  desc:'Reveal all undiscovered areas of Miami.',                                                                                                                         xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Miami_Challenge_Card.png' },
+    { name:'Coconut Balls',                     type:'D',  desc:'Disguise yourself as Florida Man.',                                                                                                                               xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Coconut_Balls.png' },
+    { name:'Mission Story - Intravenous',       type:'F',  desc:'Sierra Knox is due for an intravenous revitalization treatment at the emergency area. Interesting, 47.',                                                          xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Intravenous_Tile.png' },
+    { name:'Mission Story - The Munchies',      type:'F',  desc:"Robert Knox's favorite street food vendor has a stand at the race. Sounds promising.",                                                                           xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Munchies_Tile.png' },
+    { name:'Sympathy for the Bird',             type:'F',  desc:'Save the mascot from being eliminated by Sierra Knox.',                                                                                                           xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Sympathy_for_the_Bird.png' },
+    { name:'Mission Story - A Perfect Machine', type:'F',  desc:'Become a Kronstadt Mechanic and perform the Pitstop.',                                                                                                           xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/A_Perfect_Machine_Tile.png' },
+    { name:'The Odd One Out',                   type:'F',  desc:'Disqualify Moses Lee.',                                                                                                                                           xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Odd_One_Out.png' },
+    { name:'Communication Breakdown',           type:'F',  desc:'Sabotage the satellite dish.',                                                                                                                                    xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Communication_Breakdown.png' },
+    { name:'Mission Story - Turbo Charged',     type:'F',  desc:'A prototype Kronstadt racing car. If anything happens to it, Knox will likely come running.',                                                                    xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Turbo_Charged_Tile.png' },
+    { name:'Last Words',                        type:'F',  desc:'[REDACTED]',                                                                                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Last_Words.png' },
+    { name:'The Thunder Thief',                 type:'F',  desc:'Celebrate victory on the podium disguised as Moses Lee.',                                                                                                         xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Thunder_Thief.png' },
+    { name:'47 on the Scoville Scale',          type:'F',  desc:'Drink the chili shot.',                                                                                                                                           xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/47_on_the_Scoville_Scale.png' },
+    { name:'Déjà Due',                          type:'F',  desc:'[REDACTED]',                                                                                                                                                      xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/D3F_Due.png' },
+    { name:'Potty Training',                    type:'F',  desc:"Make the patient leave the doctor's office without eliminating him.",                                                                                             xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Potty_Training.png' },
+    { name:'Sweet Victory',                     type:'F',  desc:'[REDACTED]',                                                                                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Sweet_Victory.png' },
+    { name:'Mission Story - The New Army',      type:'F',  desc:'Infiltrate the Android showroom as Ted Mendez.',                                                                                                                  xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_New_Army_Tile.png' },
+    { name:'Mission Story - Pretty in Pink',    type:'F',  desc:"Impersonate Sierra's blackmailer and meet up with her at the hotel.",                                                                                            xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Pretty_In_Pink_Tile.png' },
+    { name:'Milky Way',                         type:'F',  desc:'Make sure Sierra Knox drinks the chili shot.',                                                                                                                    xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Milky_Way.png' },
+    { name:'Mission Story - The Triumph',       type:'F',  desc:'Tamper with the gas pressure relief valve.',                                                                                                                      xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Triumph_Challenge.png' },
+    { name:'Arms Dealer',                       type:'F',  desc:'Pacify a Kronstadt Researcher using an android arm.',                                                                                                             xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Arms_Dealer_Challenge.png' },
+    { name:'Tanked',                            type:'F',  desc:'[REDACTED]',                                                                                                                                                      xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Tanked.png' },
+    { name:'Red Flag',                          type:'F',  desc:'Cause the race to be aborted due to too many crashes.',                                                                                                           xp:'+2000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Red_Flag.png' },
+    { name:'Sleeping with the Fishes',          type:'F',  desc:'Dump a body into an aquarium.',                                                                                                                                   xp:'+1000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Sleeping_with_the_Fishes.png' },
+    { name:'The Inventor',                      type:'T',  desc:'Assassinate Robert Knox.',                                                                                                                                        xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Inventor_Still.png' },
+    { name:'The Daredevil',                     type:'T',  desc:'Assassinate Sierra Knox.',                                                                                                                                        xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Daredevil_Still.png' },
+    { name:'Silent Assassin, Suit Only',        type:'TC', desc:'Complete "The Finish Line".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.\nDo it all in your suit.',  xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/SASO_2021.png' },
+    { name:'Sniper Assassin',                   type:'TC', desc:'Complete "The Finish Line".\nAssassinate your targets with a sniper rifle.\nOnly eliminate the targets.\nDo not get spotted.',                                    xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/Sniper_Assassin_Tile_H3.png' },
+    { name:'Silent Assassin',                   type:'TC', desc:'Complete "The Finish Line".\nOnly eliminate the targets.\nNo bodies found.\nDo not get spotted.\nIf you are detected by cameras, erase or destroy the evidence.',  xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/SilentAssassin2021.png' },
+    { name:'Suit Only',                         type:'TC', desc:'Assassinate the targets and complete the mission.\nDo it all in your suit.',                                                                                       xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/SuitOnly2021.png' },
+    { name:'The Classics',                      type:'TC', desc:'Complete all The Classics challenges for "The Finish Line":\nSilent Assassin\nSilent Assassin, Suit Only\nSniper Assassin\nSuit Only',                            xp:'+4000XP', item:null, itemImg:null, img:'2 The Finish Line/Challenges/The_Classics_H3.png' },
+  ],
+  disguises: [
+    { name:'Florida Fit (Starting suit)', img:'2 The Finish Line/Disguises/Florida_Fit_Tile.png' },
+    { name:'Aeon Driver',                 img:'2 The Finish Line/Disguises/Aeon_Driver_Outfit_-_Miami.JPG.png' },
+    { name:'Aeon Mechanic',               img:'2 The Finish Line/Disguises/Aeon_Mechanic_Outfit_-_Miami.png' },
+    { name:'Blue Seed Driver',            img:'2 The Finish Line/Disguises/Blue_Seed_Driver_Outfit_-_Miami.JPG.png' },
+    { name:'Crashed Driver',              img:'2 The Finish Line/Disguises/Crashed_Driver_Kronstadt_Outfit_-_Miami.JPG.png' },
+    { name:'Kronstadt Event Security',    img:'2 The Finish Line/Disguises/Event_Security_Outfit_-_Miami.JPG.png' },
+    { name:'Event Crew',                  img:'2 The Finish Line/Disguises/Event_Crew_Outfit_-_Miami.JPG.png' },
+    { name:'Florida Man',                 img:'2 The Finish Line/Disguises/Florida_Man_Outfit_-_Miami.JPG.png' },
+    { name:'Food Vendor',                 img:'2 The Finish Line/Disguises/Food_Vendor_Outfit_-_Miami.JPG.png' },
+    { name:'Journalist',                  img:'2 The Finish Line/Disguises/Journalist_Outfit_-_Miami.JPG.png' },
+    { name:'Kitchen Staff',               img:'2 The Finish Line/Disguises/Kitchen_Staff_Outfit_-_Miami.JPG.png' },
+    { name:'Kowoon Driver',               img:'2 The Finish Line/Disguises/Kowoon_Driver_Outfit_-_Miami.JPG.png' },
+    { name:'Kowoon Mechanic',             img:'2 The Finish Line/Disguises/Kowoon_Mechanic_Outfit_-_Miami.JPG.png' },
+    { name:'Kronstadt Engineer',          img:'2 The Finish Line/Disguises/Kronstadt_Engineer_Outfit_-_Miami.JPG.png' },
+    { name:'Kronstadt Mechanic',          img:'2 The Finish Line/Disguises/Kronstadt_Mechanic_Outfit_-_Miami.JPG.png' },
+    { name:'Kronstadt Researcher',        img:'2 The Finish Line/Disguises/Kronstadt_Researcher_Outfit_-_Miami.JPG.png' },
+    { name:'Kronstadt Security',          img:'2 The Finish Line/Disguises/BlueFlamingoSuit2021 (1).png' },
+    { name:'Mascot',                      img:'2 The Finish Line/Disguises/Mascot_Outfit_-_Miami.JPG.png' },
+    { name:'Medic',                       img:'2 The Finish Line/Disguises/Medic_Outfit_-_Miami.JPG.png' },
+    { name:'Moses Lee',                   img:'2 The Finish Line/Disguises/Moses_Lee_Outfit_-_Miami.JPG.png' },
+    { name:'Pale Rider',                  img:'2 The Finish Line/Disguises/Pale_Rider_Outfit_-_Miami.JPG.png' },
+    { name:'Race Coordinator',            img:'2 The Finish Line/Disguises/Race_Coordinator_Outfit_-_Miami.JPG.png' },
+    { name:'Race Marshal',                img:'2 The Finish Line/Disguises/Race_Marshal_Outfit_-_Miami.JPG.png' },
+    { name:'Sheikh',                      img:'2 The Finish Line/Disguises/Sheikh_Outfit_-_Miami.JPG.png' },
+    { name:'Sotteraneo Mechanic',         img:'2 The Finish Line/Disguises/Sotteraneo_Mechanic_Outfit_-_Miami.JPG.png' },
+    { name:'Street Musician',             img:'2 The Finish Line/Disguises/Street_Musician_Outfit_-_Miami.JPG.png' },
+    { name:'Ted Mendez',                  img:'2 The Finish Line/Disguises/Ted_Mendez_Outfit_-_Miami.JPG.png' },
+    { name:'Thwack Driver',               img:'2 The Finish Line/Disguises/Thwack_Driver_Outfit_-_Miami.JPG.png' },
+    { name:'Thwack Mechanic',             img:'2 The Finish Line/Disguises/Thwack_Mechanic_Outfit_-_Miami.JPG.png' },
+    { name:'Waiter',                      img:'2 The Finish Line/Disguises/Waiter_Outfit_-_Miami.JPG.png' },
+  ]
+};
+
+const stateM2 = { stories:new Set(), intelligence:new Set(), challenges:new Set(), disguises:new Set() };
+
+function saveStateM2() {
+  localStorage.setItem('hitman_m2_v1', JSON.stringify({
+    stories:[...stateM2.stories], intelligence:[...stateM2.intelligence],
+    challenges:[...stateM2.challenges], disguises:[...stateM2.disguises]
+  }));
+}
+function loadStateM2() {
+  try {
+    const s = JSON.parse(localStorage.getItem('hitman_m2_v1')||'{}');
+    stateM2.stories      = new Set(s.stories||[]);
+    stateM2.intelligence = new Set(s.intelligence||[]);
+    stateM2.challenges   = new Set(s.challenges||[]);
+    stateM2.disguises    = new Set(s.disguises||[]);
+  } catch(e){}
+}
+
+function mkCheckM2(cat, id) {
+  const el = document.createElement('div');
+  el.className = 'custom-check' + (stateM2[cat].has(id) ? ' checked' : '');
+  el.onclick = function(e) {
+    e.stopPropagation();
+    if (stateM2[cat].has(id)) { stateM2[cat].delete(id); el.classList.remove('checked'); }
+    else { stateM2[cat].add(id); el.classList.add('checked'); }
+    saveStateM2(); updateProgressM2();
+    const row = el.closest('.story-item,.intel-item,.challenge-card,.disguise-card');
+    if (row) row.classList.toggle('completed', stateM2[cat].has(id));
+  };
+  return el;
+}
+
+function updateProgressM2() {
+  const cats = [
+    ['stories',      'm2-prog-stories',    'm2-pf-stories'],
+    ['intelligence', 'm2-prog-intel',      'm2-pf-intel'],
+    ['challenges',   'm2-prog-challenges', 'm2-pf-challenges'],
+    ['disguises',    'm2-prog-disguises',  'm2-pf-disguises'],
+  ];
+  cats.forEach(([cat, progId, pfId]) => {
+    const total = DATA_M2[cat].length;
+    const done  = stateM2[cat].size;
+    const prog  = document.getElementById(progId);
+    const pf    = document.getElementById(pfId);
+    if (prog) prog.innerHTML = `<span>${done}</span> / ${total}`;
+    if (pf)   pf.style.width = total ? (done/total*100)+'%' : '0%';
+  });
+
+  // Overall progress bar
+  const allTotal = cats.reduce((s,[cat]) => s + DATA_M2[cat].length, 0);
+  const allDone  = cats.reduce((s,[cat]) => s + stateM2[cat].size, 0);
+  const pct = allTotal > 0 ? Math.round(allDone/allTotal*100) : 0;
+  const opf = document.getElementById('m2-overall-prog-fill');
+  const opl = document.getElementById('m2-overall-pct-lbl');
+  if (opf) opf.style.width = pct + '%';
+  if (opl) opl.textContent = pct + '%';
+}
+
+function renderStoriesM2() {
+  const c = document.getElementById('m2-stories-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M2.stories.forEach((s,i) => {
+    const id = 'm2_story_'+i;
+    const el = document.createElement('div');
+    el.className = 'story-item' + (stateM2.stories.has(id) ? ' completed' : '');
+    const tw = document.createElement('div'); tw.className = 'story-thumb-wrap';
+    const img = document.createElement('img'); img.className = 'story-thumb';
+    img.src = s.img; img.alt = s.title; img.onerror = function(){ this.style.background='#1a1a1a'; };
+    const co = document.createElement('div'); co.className = 'story-check-overlay';
+    co.appendChild(mkCheckM2('stories', id));
+    tw.appendChild(img); tw.appendChild(co);
+    const body = document.createElement('div'); body.className = 'story-body';
+    body.innerHTML = `<div class="story-title">${s.title}</div>
+      <div class="story-subtitle-tag">${s.subtitle}</div>
+      <div class="story-desc">${s.desc}</div>`;
+    el.appendChild(tw); el.appendChild(body); c.appendChild(el);
+  });
+}
+
+function renderIntelM2(filter='') {
+  const c = document.getElementById('m2-intel-container'); if(!c) return;
+  c.innerHTML = '';
+  const lf = filter.toLowerCase();
+  DATA_M2.intelligence.forEach((item,i) => {
+    if (lf && !item.title.toLowerCase().includes(lf) && !item.desc.toLowerCase().includes(lf)) return;
+    const id = 'm2_intel_'+i;
+    const el = document.createElement('div');
+    el.className = 'intel-item' + (stateM2.intelligence.has(id) ? ' completed' : '');
+    const cw = document.createElement('div'); cw.className = 'intel-check';
+    cw.appendChild(mkCheckM2('intelligence', id));
+    const body = document.createElement('div'); body.className = 'intel-body';
+    body.innerHTML = `<div class="intel-title">${item.title}</div><div class="intel-desc">${item.desc}</div>`;
+    el.appendChild(cw); el.appendChild(body); c.appendChild(el);
+  });
+  if (!c.children.length) c.innerHTML = '<div class="empty-state">Nenhum resultado encontrado</div>';
+}
+function filterIntelM2(v) { renderIntelM2(v); }
+
+function renderChallengesM2(typeFilter) {
+  const c = document.getElementById('m2-challenges-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M2.challenges.forEach((ch,i) => {
+    if (typeFilter && ch.type !== typeFilter) return;
+    const id = 'm2_challenge_'+i;
+    const card = document.createElement('div');
+    card.className = 'challenge-card' + (stateM2.challenges.has(id) ? ' completed' : '');
+    const head = document.createElement('div'); head.className = 'challenge-head';
+    head.onclick = function(){ card.classList.toggle('expanded'); };
+    const tw = document.createElement('div'); tw.className = 'challenge-thumb-wrap';
+    const thumb = document.createElement('img'); thumb.className = 'challenge-thumb';
+    thumb.src = ch.img; thumb.alt = ch.name; thumb.onerror = function(){ this.style.background='#1a1a1a'; };
+    tw.appendChild(thumb);
+    const hb = document.createElement('div'); hb.className = 'challenge-head-body';
+    hb.innerHTML = `<div class="challenge-name"><span class="challenge-type-dot dot-${ch.type}"></span>${ch.name}</div>
+      <div class="challenge-xp">${ch.xp}${ch.item?' · 🎁':''}</div>`;
+    const cc = document.createElement('div'); cc.className = 'challenge-check-col';
+    cc.appendChild(mkCheckM2('challenges', id));
+    const ec = document.createElement('div'); ec.className = 'challenge-expand-col'; ec.innerHTML = '▼';
+    head.appendChild(tw); head.appendChild(hb); head.appendChild(cc); head.appendChild(ec);
+    const body = document.createElement('div'); body.className = 'challenge-body-content';
+    const lines = ch.desc.split('\n');
+    const rest = lines.slice(1);
+    const descHtml = rest.length
+      ? `<ul style="margin:6px 0 0 16px;padding:0">${rest.map(l=>`<li>${l}</li>`).join('')}</ul>`
+      : '';
+    body.innerHTML = `<div class="challenge-desc-text">${lines[0]}${descHtml}</div>`;
+    card.appendChild(head); card.appendChild(body); c.appendChild(card);
+  });
+}
+function filterChallengesM2(btn, type) {
+  document.querySelectorAll('#m2-body-challenges .cf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChallengesM2(type);
+}
+
+function renderDisguisesM2() {
+  const c = document.getElementById('m2-disguises-container'); if(!c) return;
+  c.innerHTML = '';
+  DATA_M2.disguises.forEach((d,i) => {
+    const id = 'm2_disguise_'+i;
+    const card = document.createElement('div');
+    card.className = 'disguise-card' + (stateM2.disguises.has(id) ? ' completed' : '');
+    const wrap = document.createElement('div'); wrap.className = 'disguise-img-wrap';
+    const img = document.createElement('img'); img.className = 'disguise-img';
+    img.src = d.img; img.alt = d.name; img.onerror = function(){ this.style.background='#1a1a1a'; };
+    const done = document.createElement('div'); done.className = 'disguise-done-overlay'; done.textContent = '✓';
+    const chkPos = document.createElement('div'); chkPos.className = 'disguise-check-pos';
+    chkPos.appendChild(mkCheckM2('disguises', id));
+    wrap.appendChild(img); wrap.appendChild(done);
+    const name = document.createElement('div'); name.className = 'disguise-name'; name.textContent = d.name;
+    card.appendChild(wrap); card.appendChild(name); card.appendChild(chkPos);
+    c.appendChild(card);
+  });
+}
+
+// ── INIT M2 ──
+loadStateM2();
+renderStoriesM2();
+renderIntelM2();
+renderChallengesM2('');
+renderDisguisesM2();
+updateProgressM2();
+</script>
+
+</body>
+</html>
