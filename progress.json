@@ -3,10 +3,12 @@
   "intelligence": [
     "intel_11"
   ],
-  "challenges": [],
+  "challenges": [
+    "challenge_33"
+  ],
   "disguises": [
     "disguise_3",
     "disguise_5"
   ],
-  "updated_at": "2026-06-04T00:23:53.065Z"
+  "updated_at": "2026-06-04T00:28:01.192Z"
 }
