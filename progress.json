@@ -1,7 +1,8 @@
 {
   "stories": [],
   "intelligence": [
-    "intel_11"
+    "intel_11",
+    "intel_39"
   ],
   "challenges": [
     "challenge_33",
@@ -12,5 +13,5 @@
     "disguise_5",
     "disguise_14"
   ],
-  "updated_at": "2026-06-04T00:30:06.588Z"
+  "updated_at": "2026-06-04T00:31:02.523Z"
 }
