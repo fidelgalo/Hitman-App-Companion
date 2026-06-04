@@ -1,6 +1,7 @@
 {
   "stories": [
-    "story_5"
+    "story_5",
+    "story_2"
   ],
   "intelligence": [
     "intel_11",
@@ -34,5 +35,5 @@
     "disguise_9",
     "disguise_17"
   ],
-  "updated_at": "2026-06-04T22:38:07.722Z"
+  "updated_at": "2026-06-04T22:44:51.859Z"
 }
